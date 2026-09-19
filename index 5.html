@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#080b14">
+<title>NEON REX — Outrun Extinction</title>
+<style>
+  :root{color-scheme:dark;--bg:#080b14;--panel:#101622;--line:#25303d;--text:#edf8fb;--muted:#93a5b6;--cyan:#76ffe0;--pink:#fa73d3;--gold:#ffdb78;--violet:#ad94ff}
+  *{box-sizing:border-box} [hidden]{display:none!important}
+  body{margin:0;background:radial-gradient(ellipse at 75% 20%,#1c1535 0,transparent 48%),var(--bg);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100svh}
+  button{font:inherit;color:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent} button:focus-visible{outline:2px solid var(--cyan);outline-offset:5px}
+  button:disabled{cursor:default;opacity:.45} button,canvas{touch-action:manipulation}
+  .app{max-width:1328px;margin:auto;padding:28px 40px 20px} .topbar{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:25px}
+  .brand{display:flex;gap:12px;align-items:center;font-size:19px;font-weight:900;letter-spacing:-.7px}.brand-mark{display:grid;place-items:center;width:38px;height:38px;border:1px solid #76ffe04a;background:#76ffe012;color:var(--cyan);border-radius:11px;font-size:25px}
+  .brand small{display:block;font:9px ui-monospace,monospace;color:var(--muted);letter-spacing:2.4px;margin-top:4px}.top-actions{display:flex;gap:9px}.tool{border:1px solid var(--line);background:#111722;border-radius:9px;padding:10px 13px;font:10px ui-monospace,monospace;letter-spacing:1px;transition:border-color .2s}.tool:hover{border-color:var(--cyan)}
+  .section-line{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;font:10px ui-monospace,monospace;letter-spacing:2px;color:var(--muted)}.live{color:var(--cyan)}.live:before{content:"";display:inline-block;width:6px;height:6px;background:var(--cyan);border-radius:50%;margin-right:9px;box-shadow:0 0 10px #76ffe099}
+  .stage{position:relative;height:620px;border:1px solid #304052;border-radius:20px;overflow:hidden;background:#090e1d;box-shadow:0 24px 100px #0005;isolation:isolate}
+  canvas{display:block;width:100%;height:100%;touch-action:none;outline:none}.scanlines{position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(transparent 0 3px,#0000000a 3px 4px);z-index:1}
+  .menu{position:absolute;inset:0;padding:36px 40px 24px;background:linear-gradient(90deg,#080e1eed 0%,#080e1e9c 42%,transparent 76%);z-index:3;display:flex;flex-direction:column}
+  .eyebrow{font:10px ui-monospace,monospace;letter-spacing:3px;color:var(--cyan);margin:0 0 16px}.eyebrow span{display:inline-block;width:24px;height:1px;vertical-align:middle;margin-right:10px;background:var(--cyan)}
+  h1{font-size:clamp(54px,6.4vw,88px);line-height:.95;letter-spacing:-5px;margin:0;font-weight:950}h1 em{font-style:normal;color:var(--cyan);text-shadow:0 0 40px #76ffe021}
+  .intro p{font-size:13px;line-height:1.7;color:#adbccd;max-width:365px;margin:17px 0 0}.intro{min-height:260px}.choose-label{font:9px ui-monospace,monospace;color:var(--muted);letter-spacing:2px;margin:6px 0 11px}
+  .modes{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.mode{position:relative;text-align:left;min-height:105px;padding:16px;border:1px solid #354055;border-radius:11px;background:#0c1422e8;transition:background .2s,border-color .2s,transform .2s}
+  .mode:hover{transform:translateY(-2px);border-color:#77879e}.mode[aria-pressed="true"]{border-color:var(--cyan);background:#12312fe8;box-shadow:inset 0 0 22px #76ffe006}.mode-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}.mode-index{font:10px ui-monospace,monospace;color:var(--cyan)}.radio{border:1px solid #687887;border-radius:50%;width:12px;height:12px}.mode[aria-pressed="true"] .radio{background:var(--cyan);border:3px solid #254d45;box-shadow:0 0 0 1px var(--cyan)}.mode strong{display:block;font-size:15px;font-weight:700;margin-bottom:5px}.mode small{font-size:10px;color:#a9bbcb}
+  .menu-bottom{display:flex;align-items:center;gap:23px;margin-top:22px}.primary{display:flex;align-items:center;justify-content:space-between;gap:30px;border:0;border-radius:9px;background:var(--cyan);color:#082420;padding:18px 24px;font-size:12px;font-weight:850;letter-spacing:1px;box-shadow:0 0 30px #76ffe014;transition:filter .2s,transform .2s}.primary:hover{filter:brightness(1.1);transform:translateY(-1px)}.primary b{font-size:19px;line-height:14px}.mode-note{font-size:11px;color:#adbecb;line-height:1.7;max-width:290px}.menu-foot{margin-top:auto;padding-top:17px;display:flex;justify-content:space-between;font:9px ui-monospace,monospace;color:#7e92a7;letter-spacing:1.3px}
+  .hud{position:absolute;inset:25px 27px auto;z-index:2;display:flex;justify-content:space-between;gap:12px;pointer-events:none}.hud-left,.hud-right{display:flex;gap:28px;align-items:flex-start}.metric label{display:block;color:#a5b7cc;font:9px ui-monospace,monospace;letter-spacing:2px;margin-bottom:5px}.metric strong{font:700 31px ui-monospace,monospace;letter-spacing:-1px}.metric.small strong{font-size:20px;color:#b9c9dd}.multiplier{font:700 12px ui-monospace,monospace;color:var(--gold);background:#ffdb7812;border:1px solid #ffdb7838;padding:7px 10px;border-radius:7px;margin-top:12px}.hud button{pointer-events:auto}.timer.low strong{color:#ff7096}.ability{width:120px;font:9px ui-monospace,monospace;letter-spacing:1px;color:var(--cyan);margin-top:3px}.ability b{display:block;font-size:11px;margin-top:7px}.meter{display:block;height:3px;background:#ffffff1c;margin-top:8px;border-radius:3px;overflow:hidden}.meter i{display:block;background:var(--cyan);height:100%;width:100%}.pause-button{font-size:16px;padding:8px 13px}
+  .power-rack{position:absolute;left:25px;bottom:23px;right:25px;display:flex;gap:7px;z-index:2;pointer-events:none}.power-chip{font:10px ui-monospace,monospace;color:#718394;padding:8px 10px;background:#090f1ddb;border:1px solid #364358;border-radius:6px}.power-chip.active{color:var(--power);border-color:var(--power);box-shadow:0 0 15px #ffffff09}.power-chip b{font-weight:400;margin-left:6px}.run-hint{position:absolute;left:0;right:0;top:105px;text-align:center;font:11px ui-monospace,monospace;color:#b8cddd;pointer-events:none;z-index:2;letter-spacing:1px}
+  .overlay{position:absolute;inset:0;display:grid;place-items:center;z-index:5;background:#070c19ad;backdrop-filter:blur(9px);padding:22px}.dialog{width:min(410px,100%);border:1px solid #435366;background:linear-gradient(140deg,#172232f7,#0b1220f7);border-radius:18px;padding:33px;text-align:center;box-shadow:0 20px 100px #0007}.dialog h2{font-size:46px;line-height:1;letter-spacing:-2px;margin:12px 0 14px}.dialog p{font-size:12px;line-height:1.7;color:#b1c2d0}.dialog .primary{width:100%;margin-top:22px}.secondary{border:1px solid #394658;background:transparent;border-radius:8px;font-size:11px;padding:12px 20px;width:100%;margin-top:10px;color:#b6c6d5}.secondary:hover{border-color:#96adbc}.results{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:23px 0}.results strong{font:700 22px ui-monospace,monospace;display:block;color:var(--cyan)}.results small{display:block;font:9px ui-monospace,monospace;color:var(--muted);letter-spacing:1px;margin-top:7px}
+  .controls{display:flex;justify-content:space-between;gap:14px;padding:19px 2px;color:#9bafc2;font-size:10px}.keys{display:flex;gap:20px;flex-wrap:wrap}.keys span{white-space:nowrap}kbd{display:inline-block;font:10px ui-monospace,monospace;background:#151e2b;border:1px solid #354255;border-bottom-width:2px;border-radius:4px;padding:4px 6px;color:#d4e5ef;margin-right:4px}.control-note{color:#698196;font:9px ui-monospace,monospace;align-self:center;letter-spacing:1px}
+  .power-guide{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;border-top:1px solid #202b39;padding:23px 0 8px}.guide{display:flex;align-items:center;gap:12px}.guide-icon{width:34px;height:34px;display:grid;place-items:center;background:#ffffff04;border:1px solid #ffffff19;border-radius:9px;color:var(--power);font-size:20px}.guide strong{display:block;font-size:11px;font-weight:600}.guide small{display:block;font-size:10px;color:#8396ac;margin-top:5px}.touch-controls{display:none;gap:10px;padding-top:12px}.touch-controls button{flex:1;touch-action:none;user-select:none;border:1px solid #3a5065;background:#142030;border-radius:10px;padding:16px 4px;color:var(--cyan);font:700 11px ui-monospace,monospace}.touch-controls button.pressed{background:#235747}.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
+  @media(max-width:900px){.app{padding:20px}.stage{height:600px}.menu{padding:30px}.intro{min-height:255px}h1{font-size:68px}.control-note{display:none}.power-guide{gap:12px}.guide{gap:8px}.guide small{font-size:9px}.hud-left,.hud-right{gap:14px}}
+  @media(max-width:600px){.app{padding:16px 12px}.topbar{margin-bottom:20px}.brand{font-size:16px}.brand small{font-size:8px}.brand-mark{width:32px;height:32px}.tool{padding:9px;font-size:9px}.section-line{font-size:8px;letter-spacing:1px}.stage{height:690px;border-radius:15px}.app[data-state="playing"] .stage,.app[data-state="paused"] .stage,.app[data-state="over"] .stage{height:440px}.menu{padding:25px 21px;background:linear-gradient(90deg,#080e1ee8,#080e1e65)}.intro{min-height:252px}h1{font-size:57px;letter-spacing:-3.5px}.intro p{max-width:230px;font-size:12px}.eyebrow{font-size:8px;letter-spacing:2px}.modes{grid-template-columns:1fr;gap:8px}.mode{min-height:73px;padding:13px 14px 13px 45px}.mode-top{position:absolute;left:14px;top:18px;margin:0}.mode-index{font-size:10px}.radio{display:none}.mode strong{font-size:13px}.mode small{font-size:10px}.menu-bottom{gap:13px;margin-top:17px;align-items:stretch}.menu-bottom .primary{padding:15px 17px;gap:18px;font-size:10px;flex-shrink:0}.mode-note{font-size:9px;line-height:1.6}.menu-foot{font-size:7px;letter-spacing:.6px;padding-top:13px}.menu-foot span:last-child{display:none}.hud{inset:17px 15px auto}.hud-left,.hud-right{gap:12px}.metric label{font-size:7px;letter-spacing:1px}.metric strong{font-size:22px}.metric.small strong{font-size:14px}.multiplier{font-size:9px;padding:5px;margin-top:10px}.ability{position:absolute;right:0;top:55px;width:92px;font-size:8px}.ability b{font-size:9px}.pause-button{font-size:13px;padding:7px 10px}.power-rack{left:13px;right:13px;bottom:16px;gap:5px;flex-wrap:wrap}.power-chip{font-size:8px;padding:6px}.run-hint{top:99px;font-size:8px;letter-spacing:0}.controls{padding:15px 0;font-size:9px}.keys{gap:8px}.keys span:last-child{display:none}kbd{font-size:8px;padding:3px 4px}.power-guide{grid-template-columns:repeat(2,1fr);gap:17px 12px;padding-top:18px}.touch-controls{display:flex}.dialog{padding:25px}.dialog h2{font-size:38px}}
+  @media(pointer:coarse){.touch-controls{display:flex}.controls .keys{opacity:.65}}
+  @media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;transition:none!important}}
+</style>
+</head>
+<body>
+<main class="app" id="app" data-state="menu">
+  <header class="topbar">
+    <div class="brand"><span class="brand-mark" aria-hidden="true">↗</span><div>NEON REX<small>THE AFTERHOURS ARCADE</small></div></div>
+    <div class="top-actions"><button class="tool" id="soundBtn" aria-pressed="true" title="Toggle sound (M)">SOUND ON</button><button class="tool" id="fxBtn" aria-pressed="true" title="Toggle screen shake and extra particles">FX ON</button></div>
+  </header>
+  <div class="section-line"><span>01 / OUTRUN EXTINCTION</span><span class="live" id="modeLabel">CLASSIC EVOLVED</span></div>
+  <section class="stage" id="stage" aria-label="Neon Rex arcade game">
+    <canvas id="game" tabindex="0" aria-label="Endless dinosaur runner. Space, Up or W jumps; Down or S ducks; X or Shift uses an ability; P or Escape pauses.">This game needs a browser with HTML Canvas support.</canvas>
+    <div class="scanlines"></div>
+    <div class="hud" id="hud" hidden>
+      <div class="hud-left"><div class="metric"><label>SCORE</label><strong id="score">00000</strong></div><span class="multiplier" id="multi">×1</span><div class="metric timer" id="timer" hidden><label>TIME LEFT</label><strong id="clock">45.0</strong></div></div>
+      <div class="hud-right"><div class="metric small"><label>PERSONAL BEST</label><strong id="best">00000</strong></div><div class="ability"><span id="abilityName">PHASE / X</span><b id="abilityStatus">READY</b><span class="meter"><i id="abilityFill"></i></span></div><button class="tool pause-button" id="pauseBtn" title="Pause (P / Escape)" aria-label="Pause game">Ⅱ</button></div>
+    </div>
+    <div class="run-hint" id="hint" hidden></div>
+    <div class="power-rack" id="powerRack" hidden>
+      <span class="power-chip" id="shieldChip" style="--power:#7ccfff">◇ SHIELD<b></b></span><span class="power-chip" id="slowChip" style="--power:#b49aff">◷ CHRONO<b></b></span><span class="power-chip" id="magnetChip" style="--power:#ff91d9">∩ MAGNET<b></b></span><span class="power-chip" id="jetChip" style="--power:#ffdb78">↑ JETPACK<b></b></span>
+    </div>
+    <div class="menu" id="menu">
+      <div class="intro"><div class="eyebrow"><span></span>NO SIGNAL. ALL ADRENALINE.</div><h1>THE FUTURE<br>HAS <em>TEETH.</em></h1><p>A prehistoric icon. A neon afterlife.<br>Jump, blast, and bend time. Make every run count.</p></div>
+      <div class="choose-label">CHOOSE YOUR RUN</div>
+      <div class="modes" aria-label="Game mode">
+        <button class="mode" data-mode="classic" aria-pressed="true"><span class="mode-top"><span class="mode-index">01 /</span><span class="radio"></span></span><strong>Classic Evolved</strong><small>Pure instinct. An endless horizon.</small></button>
+        <button class="mode" data-mode="shooter" aria-pressed="false"><span class="mode-top"><span class="mode-index">02 /</span><span class="radio"></span></span><strong>Cyber-Shooter</strong><small>Less running scared. More lasers.</small></button>
+        <button class="mode" data-mode="time" aria-pressed="false"><span class="mode-top"><span class="mode-index">03 /</span><span class="radio"></span></span><strong>Time Attack</strong><small>45 seconds. Make them legendary.</small></button>
+      </div>
+      <div class="menu-bottom"><button class="primary" id="startBtn">START GAME <b>↗</b></button><span class="mode-note" id="modeNote">One hit ends the run. Hold jump for height.<br>X / Shift: phase through danger.</span></div>
+      <div class="menu-foot"><span id="menuBest">PERSONAL BEST / 00000</span><span>BUILT FOR ONE MORE TRY.</span></div>
+    </div>
+    <div class="overlay" id="pauseOverlay" hidden><div class="dialog" role="dialog" aria-modal="true" aria-labelledby="pauseTitle"><div class="eyebrow">TAKE A BREATHER</div><h2 id="pauseTitle">TIME IS<br>ON YOUR SIDE.</h2><p>The city can wait. Your run is paused.<br>Press P / Escape or resume when you're ready.</p><button class="primary" id="resumeBtn">RESUME RUN <b>→</b></button><button class="secondary" id="pauseMenuBtn">BACK TO MAIN MENU</button></div></div>
+    <div class="overlay" id="overOverlay" hidden><div class="dialog" role="dialog" aria-modal="true" aria-labelledby="overTitle"><div class="eyebrow" id="overLabel">EXTINCTION IS TEMPORARY</div><h2 id="overTitle">ONE MORE<br>RUN?</h2><p id="overReason">The city got you. Take it back.</p><div class="results"><div><strong id="finalScore">0</strong><small>SCORE</small></div><div><strong id="finalBest">0</strong><small>BEST</small></div><div><strong id="finalCoins">0</strong><small>TOKENS</small></div></div><button class="primary" id="retryBtn">RETRY RUN <b>↗</b></button><button class="secondary" id="overMenuBtn">CHANGE MODE</button></div></div>
+  </section>
+  <div class="touch-controls" id="touchControls" aria-label="Touch game controls"><button data-action="duck" disabled>↓ DUCK</button><button data-action="ability" id="touchAbility" disabled>✦ PHASE</button><button data-action="jump" disabled>↑ HOLD TO JUMP</button></div>
+  <div class="controls"><div class="keys"><span><kbd>SPACE</kbd><kbd>↑</kbd><kbd>W</kbd> Jump / hold higher</span><span><kbd>↓</kbd><kbd>S</kbd> Duck / fast fall</span><span><kbd>X</kbd><kbd>SHIFT</kbd> Ability</span><span><kbd>P</kbd> Pause</span></div><span class="control-note">STAY CURIOUS. STAY UNEXTINCT.</span></div>
+  <div class="power-guide"><div class="guide"><span class="guide-icon" style="--power:#7ccfff">◇</span><div><strong>Shield</strong><small>One hit. Zero regrets.</small></div></div><div class="guide"><span class="guide-icon" style="--power:#b49aff">◷</span><div><strong>Chrono-Slow</strong><small>The world slows for 5s.</small></div></div><div class="guide"><span class="guide-icon" style="--power:#ff91d9">∩</span><div><strong>Coin Magnet</strong><small>Good things come to you.</small></div></div><div class="guide"><span class="guide-icon" style="--power:#ffdb78">↑</span><div><strong>Jetpack</strong><small>Take the golden route.</small></div></div></div>
+  <div class="sr-only" id="announce" role="status" aria-live="polite"></div>
+</main>
+<script>
+(() => {
+  'use strict';
+  // All art and sound are generated here. No assets, imports, or network requests.
+  const $ = id => document.getElementById(id);
+  const canvas = $('game'), ctx = canvas.getContext('2d'), stage = $('stage');
+  if (!ctx) { $('modeNote').textContent = 'Canvas is unavailable in this browser.'; $('startBtn').disabled = true; return; }
+  const H = 600, GROUND = 475, STEP = 1 / 120;
+  const C = {cyan:'#76ffe0',pink:'#fa73d3',gold:'#ffdb78',violet:'#ad94ff',blue:'#7ccfff'};
+  const modes = {
+    classic: {name:'CLASSIC EVOLVED',note:'One hit ends the run. Hold jump for height.<br>X / Shift: phase through danger.'},
+    shooter: {name:'CYBER-SHOOTER',note:'Hold X / Shift to fire. Birds fire back.<br>Armored barriers need two laser hits.'},
+    time: {name:'TIME ATTACK',note:'Start with 45s. Hits −5s. Batteries +5s.<br>X / Shift: phase through danger.'}
+  };
+  const rand = (a,b) => a + Math.random() * (b-a);
+  const clamp = (v,a,b) => Math.max(a,Math.min(b,v));
+  const overlaps = (a,b) => a.x < b.x+b.w && a.x+a.w > b.x && a.y < b.y+b.h && a.y+a.h > b.y;
+  const pad = n => String(Math.floor(n)).padStart(5,'0');
+  const storage = {
+    get(key,fallback) { try { const value=localStorage.getItem('neon-rex-'+key); return value === null ? fallback : value; } catch { return fallback; } },
+    set(key,value) { try { localStorage.setItem('neon-rex-'+key,String(value)); } catch { /* Private/file URLs may disable persistence. */ } }
+  };
+  let mode='classic', state='menu', W=1200, dpr=1, visualTime=0, scenery=0;
+  let fx = storage.get('fx',matchMedia('(prefers-reduced-motion: reduce)').matches?'0':'1') === '1';
+  const records = Object.fromEntries(Object.keys(modes).map(k => [k,Math.max(0,Number(storage.get('best-'+k,0))||0)]));
+
+  // Lazy, gesture-unlocked Web Audio. Voice limits and onended cleanup prevent leaks.
+  const audio = {
+    context:null, master:null, voices:0, muted:storage.get('muted','0')==='1',
+    unlock() {
+      try {
+        if (!this.context) {
+          const Audio = window.AudioContext || window.webkitAudioContext;
+          if (!Audio) return;
+          this.context=new Audio(); this.master=this.context.createGain();
+          this.master.gain.value=this.muted?0:.16; this.master.connect(this.context.destination);
+        }
+        if(this.context.state==='suspended') this.context.resume().catch(()=>{});
+      } catch { /* Audio is optional; the game always remains playable. */ }
+    },
+    tone(from,to,length=.12,type='sine',delay=0,volume=.45) {
+      if(this.muted || !this.context || this.context.state!=='running' || this.voices>=24) return;
+      const t=this.context.currentTime+delay, osc=this.context.createOscillator(), gain=this.context.createGain();
+      osc.type=type; osc.frequency.setValueAtTime(from,t); osc.frequency.exponentialRampToValueAtTime(Math.max(20,to),t+length);
+      gain.gain.setValueAtTime(.001,t); gain.gain.exponentialRampToValueAtTime(volume,t+.008); gain.gain.exponentialRampToValueAtTime(.001,t+length);
+      osc.connect(gain); gain.connect(this.master); this.voices++;
+      osc.onended=()=>{osc.disconnect();gain.disconnect();this.voices--;}; osc.start(t); osc.stop(t+length+.02);
+    },
+    play(name) {
+      if(name==='jump') this.tone(220,660,.16,'triangle');
+      if(name==='coin') this.tone(900,1400,.08,'sine',0,.3);
+      if(name==='shot') this.tone(1000,240,.09,'sawtooth',0,.16);
+      if(name==='hit') {this.tone(130,28,.24,'sawtooth');this.tone(65,30,.3,'triangle');}
+      if(name==='power') [440,660,880,1320].forEach((f,i)=>this.tone(f,f*1.05,.12,'sine',i*.055,.35));
+      if(name==='phase') this.tone(160,1200,.28,'triangle');
+      if(name==='over') [330,277,196,98].forEach((f,i)=>this.tone(f,f*.7,.22,'triangle',i*.10));
+    },
+    toggle() {this.unlock();this.muted=!this.muted;if(this.master)this.master.gain.setTargetAtTime(this.muted?0:.16,this.context.currentTime,.02);storage.set('muted',this.muted?'1':'0');updateSettings();}
+  };
+
+  // Bounded, reusable object pools. Swap-removal is safe with backwards iteration.
+  class Pool {
+    constructor(limit){this.limit=limit;this.items=[];this.free=[];}
+    spawn(data){if(this.items.length>=this.limit)return null;const o=this.free.pop()||{};for(const k of Object.keys(o))delete o[k];Object.assign(o,data);this.items.push(o);return o;}
+    remove(i){const o=this.items[i],last=this.items.pop();if(i<this.items.length)this.items[i]=last;this.free.push(o);}
+    clear(){while(this.items.length)this.free.push(this.items.pop());}
+  }
+  const obstacles=new Pool(45), pickups=new Pool(160), lasers=new Pool(45), hostile=new Pool(50), particles=new Pool(280), labels=new Pool(25);
+  const pools=[obstacles,pickups,lasers,hostile,particles,labels];
+  const player={x:180,y:GROUND,vy:0,duck:false,hold:0,shield:false,slow:0,magnet:0,jet:0,landing:false,inv:0,phase:0,cooldown:0};
+  const run={score:0,time:45,elapsed:0,distance:0,speed:340,coins:0,combo:0,comboTime:0,multiplier:1,gap:650,coinGap:450,powerGap:1700,batteryGap:1000,jetGap:0,shake:0,flash:0,bag:[]};
+  const inputs={jump:new Set(),duck:new Set(),ability:new Set()};
+  let jumpBuffer=0, accumulator=0, lastTime=0, hudTime=0;
+  const held=a=>inputs[a].size>0;
+  const body=()=>player.duck?{x:player.x+5,y:player.y-31,w:65,h:26}:{x:player.x+13,y:player.y-64,w:43,h:58};
+  const screenSpeed=()=>clamp(W/1100,.55,1.15);
+  function clearInput(){Object.values(inputs).forEach(s=>s.clear());jumpBuffer=0;document.querySelectorAll('.pressed').forEach(b=>b.classList.remove('pressed'));}
+  function press(action,source){if(state!=='playing')return;const first=!held(action);inputs[action].add(source);if(first&&action==='jump')jumpBuffer=.13;if(first&&action==='ability')useAbility();}
+  function release(action,source){inputs[action].delete(source);}
+  function floating(text,x,y,color=C.cyan){labels.spawn({text,x,y,color,life:1.2,max:1.2});}
+  function burst(x,y,color,count=15){for(let i=0;i<(fx?count:Math.min(4,count));i++)particles.spawn({x,y,vx:rand(-190,190),vy:rand(-230,80),life:rand(.25,.65),max:.65,size:rand(2,5),color});}
+  function shake(amount){if(fx)run.shake=Math.max(run.shake,amount);}
+  function addScore(n,x,y){const value=n*run.multiplier;run.score+=value;if(x!==undefined)floating('+'+value,x,y,C.gold);}
+  function announce(text){$('announce').textContent=text;}
+
+  // Explicit states: there is one RAF loop; retries never create another loop/listener.
+  function setState(next){
+    state=next;clearInput();accumulator=0;$('app').dataset.state=next;
+    $('menu').hidden=next!=='menu';$('pauseOverlay').hidden=next!=='paused';$('overOverlay').hidden=next!=='over';
+    $('hud').hidden=next==='menu';$('powerRack').hidden=next==='menu';$('hint').hidden=next!=='playing';
+    $('pauseBtn').disabled=next!=='playing';document.querySelectorAll('[data-action]').forEach(b=>b.disabled=next!=='playing');
+    if(next==='paused')$('resumeBtn').focus({preventScroll:true});
+    if(next==='over')$('retryBtn').focus({preventScroll:true});
+    if(next==='playing')canvas.focus({preventScroll:true});
+    if(next==='menu')$('startBtn').focus({preventScroll:true});
+    resize();
+  }
+  function selectMode(next){mode=next;document.querySelectorAll('[data-mode]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.mode===mode)));$('modeLabel').textContent=modes[mode].name;$('modeNote').innerHTML=modes[mode].note;$('menuBest').textContent='PERSONAL BEST / '+pad(records[mode]);}
+  function start(){
+    audio.unlock();pools.forEach(p=>p.clear());
+    Object.assign(player,{y:GROUND,vy:0,duck:false,hold:0,shield:false,slow:0,magnet:0,jet:0,landing:false,inv:0,phase:0,cooldown:0});
+    Object.assign(run,{score:0,time:45,elapsed:0,distance:0,speed:340*screenSpeed(),coins:0,combo:0,comboTime:0,multiplier:1,gap:500*screenSpeed(),coinGap:180,powerGap:1200*screenSpeed(),batteryGap:750*screenSpeed(),jetGap:0,shake:0,flash:0,bag:[]});
+    $('timer').hidden=mode!=='time';$('abilityName').textContent=mode==='shooter'?'BLASTER / X':'PHASE / X';$('touchAbility').textContent=mode==='shooter'?'✦ FIRE':'✦ PHASE';
+    setState('playing');updateHUD();audio.play('power');announce(modes[mode].name+'. Run started.');
+  }
+  function pause(){if(state==='playing'){setState('paused');announce('Game paused.');}else if(state==='paused'){audio.unlock();setState('playing');}}
+  function mainMenu(){pools.forEach(p=>p.clear());run.shake=0;run.flash=0;setState('menu');selectMode(mode);}
+  function finish(reason){
+    if(state!=='playing')return;
+    const score=Math.floor(run.score),record=score>records[mode];
+    if(record){records[mode]=score;storage.set('best-'+mode,score);}
+    $('finalScore').textContent=score;$('finalBest').textContent=records[mode];$('finalCoins').textContent=run.coins;
+    $('overLabel').textContent=record?'A NEW PERSONAL BEST':'EXTINCTION IS TEMPORARY';$('overReason').textContent=reason;
+    updateHUD();setState('over');audio.play('over');announce('Run complete. Score '+score+(record?'. New personal best!':'.'));
+  }
+  function useAbility(){
+    if(state!=='playing'||player.cooldown>0)return;
+    if(mode==='shooter'){
+      const muzzle=player.y-(player.duck?18:32);lasers.spawn({x:player.x+71,y:muzzle,w:24,h:5});player.cooldown=.20;audio.play('shot');
+      burst(player.x+76,muzzle,C.cyan,3);
+    }else{player.phase=.65;player.cooldown=8;audio.play('phase');floating('PHASE SHIFT',player.x+35,player.y-90,C.violet);}
+  }
+  function hit(){
+    if(player.inv>0||player.phase>0||player.jet>0||player.landing)return;
+    shake(11);run.flash=.16;burst(player.x+35,player.y-35,player.shield?C.blue:C.pink,25);audio.play('hit');
+    run.combo=0;run.comboTime=0;run.multiplier=1;
+    if(player.shield){player.shield=false;player.inv=1.1;floating('SHIELD SAVED YOU',player.x+35,player.y-85,C.blue);return;}
+    if(mode==='time'){run.time=Math.max(0,run.time-5);player.inv=1.4;floating('−5 SECONDS',player.x+35,player.y-85,C.pink);if(run.time<=0)finish('Time is up. Another future is one run away.');}
+    else finish(mode==='shooter'?'Outgunned, this time. Reload and rewrite history.':'The city got you. Take it back.');
+  }
+  function collect(item){
+    burst(item.x,item.y,item.kind==='coin'?C.gold:C.cyan,8);
+    if(item.kind==='coin'){
+      run.coins++;run.combo++;run.comboTime=4;run.multiplier=Math.min(4,1+Math.floor(run.combo/5));addScore(25,item.x,item.y-15);audio.play('coin');return;
+    }
+    audio.play('power');
+    const names={shield:'SHIELD ONLINE',slow:'CHRONO-SLOW · 5s',magnet:'COIN MAGNET · 8s',jet:'JETPACK · 6s',battery:'+5 SECONDS'};
+    if(item.kind==='shield')player.shield=true;
+    if(item.kind==='slow')player.slow=5;
+    if(item.kind==='magnet')player.magnet=8;
+    if(item.kind==='battery')run.time=Math.min(90,run.time+5);
+    if(item.kind==='jet'){
+      player.jet=6;player.landing=false;player.vy=0;run.jetGap=0;
+      for(let x=player.x+80;x<W+80;x+=52)pickups.spawn({kind:'coin',x,y:168,r:9,phase:rand(0,6)});
+    }
+    floating(names[item.kind],player.x+55,player.y-100,item.kind==='battery'?C.gold:C.cyan);announce(names[item.kind]);
+  }
+
+  // Spacing is measured in world distance, so slow motion cannot compress patterns.
+  // Each pattern is independently jumpable; birds never stack over a ground hurdle.
+  function spawnObstacle(kind,x){
+    let w=32,h=rand(36,52),y=GROUND-h,hp=1;
+    if(kind==='hurdle'){w=25;h=34;y=GROUND-h;}
+    if(kind==='barrier'){w=47;h=60;y=GROUND-h;hp=2;}
+    if(kind==='birdLow'||kind==='birdHigh'){w=58;h=31;y=GROUND-(kind==='birdLow'?78:173);}
+    return obstacles.spawn({kind,x,y,w,h,hp,passed:false,fire:rand(1,1.7),phase:rand(0,6)});
+  }
+  function pattern(){
+    const x=W+70,r=Math.random();let width=50;
+    if(run.elapsed<5)spawnObstacle('cactus',x);
+    else if(r<.25){spawnObstacle('hurdle',x);spawnObstacle('hurdle',x+64);width=100;}
+    else if(r<.47)spawnObstacle('birdLow',x);
+    else if(r<.63)spawnObstacle('birdHigh',x);
+    else if(mode==='shooter'&&r<.83)spawnObstacle('barrier',x);
+    else spawnObstacle('cactus',x);
+    run.gap=width+run.speed*rand(1.45,2.15);
+  }
+  function nextPower(){
+    if(!run.bag.length){run.bag=['shield','slow','magnet','jet'];for(let i=3;i>0;i--){const j=Math.floor(Math.random()*(i+1));[run.bag[i],run.bag[j]]=[run.bag[j],run.bag[i]];}}
+    return run.bag.pop();
+  }
+  function update(dt){
+    run.elapsed+=dt;player.cooldown=Math.max(0,player.cooldown-dt);player.inv=Math.max(0,player.inv-dt);player.phase=Math.max(0,player.phase-dt);
+    for(const k of ['slow','magnet','jet'])player[k]=Math.max(0,player[k]-dt);
+    run.comboTime=Math.max(0,run.comboTime-dt);if(!run.comboTime){run.combo=0;run.multiplier=1;}
+    if(mode==='time'){run.time=Math.max(0,run.time-dt);if(run.time<=0){finish('Time is up. Another future is one run away.');return;}}
+    const worldDt=dt*(player.slow>0?.42:1);
+    run.speed=Math.min(680,340+run.elapsed*4.2)*screenSpeed();
+    const travel=run.speed*worldDt;run.distance+=travel;scenery+=travel;run.score+=travel*.035*run.multiplier;
+    if(mode==='shooter'&&held('ability'))useAbility();
+    player.duck=held('duck')&&player.y>=GROUND&&player.jet<=0;
+    if(player.jet>0){player.y+=(210-player.y)*Math.min(1,dt*7);player.vy=0;player.landing=true;jumpBuffer=0;
+      run.jetGap-=travel;if(run.jetGap<=0){pickups.spawn({kind:'coin',x:W+35,y:168,r:9,phase:0});run.jetGap=50;}
+      if(Math.random()<dt*40)burst(player.x+11,player.y-17,C.gold,2);
+    }else{
+      if(jumpBuffer>0&&player.y>=GROUND){player.vy=-650;player.duck=false;player.hold=0;jumpBuffer=0;audio.play('jump');burst(player.x+25,GROUND,C.cyan,7);}
+      if(player.y<GROUND||player.vy<0){
+        player.hold+=dt;let gravity=2100;
+        if(player.vy<0)gravity*=held('jump')&&player.hold<.22?.48:!held('jump')?1.55:1;
+        if(held('duck')){player.vy=Math.max(520,player.vy);gravity*=2.4;}
+        player.vy+=gravity*dt;player.y+=player.vy*dt;
+        if(player.y>=GROUND){player.y=GROUND;player.vy=0;if(player.landing){player.landing=false;player.inv=Math.max(player.inv,1.25);}burst(player.x+25,GROUND,C.cyan,5);}
+      }
+    }
+    jumpBuffer=Math.max(0,jumpBuffer-dt);
+    run.gap-=travel;run.coinGap-=travel;run.powerGap-=travel;run.batteryGap-=travel;
+    if(run.gap<=0)pattern();
+    if(run.coinGap<=0){for(let i=0;i<6;i++)pickups.spawn({kind:'coin',x:W+70+i*40,y:GROUND-52-Math.sin(i/5*Math.PI)*86,r:9,phase:i});run.coinGap=run.speed*rand(3.0,4.5);}
+    if(run.powerGap<=0){pickups.spawn({kind:nextPower(),x:W+80,y:GROUND-62,r:17,phase:0});run.powerGap=run.speed*rand(8,10);}
+    if(mode==='time'&&run.batteryGap<=0){pickups.spawn({kind:'battery',x:W+60,y:GROUND-48,r:15,phase:0});run.batteryGap=run.speed*rand(5.2,7.2);}
+    for(let i=obstacles.items.length-1;i>=0;i--){
+      const o=obstacles.items[i];o.x-=travel;o.phase+=worldDt*9;
+      if(mode==='shooter'&&o.kind.startsWith('bird')&&o.x<W-25&&o.x>player.x+180){
+        o.fire-=worldDt;if(o.fire<=0){const b=body(),vx=-Math.max(250,run.speed*.85),slope=(b.y+b.h/2-o.y-20)/(player.x+35-o.x);
+          hostile.spawn({x:o.x,y:o.y+20,vx,vy:clamp(vx*slope,-210,210),w:14,h:10});o.fire=1.7;}
+      }
+      if(!o.passed&&o.x+o.w<player.x){o.passed=true;addScore(15);}
+      if(o.x+o.w<-80)obstacles.remove(i);
+    }
+    // Swept laser boxes prevent tunneling through thin obstacles even on slow frames.
+    for(let i=lasers.items.length-1;i>=0;i--){
+      const b=lasers.items[i],old=b.x;b.x+=1050*dt;const sweep={x:old,y:b.y-3,w:b.x-old+24,h:6};
+      let target=-1,nearest=Infinity;
+      for(let j=0;j<obstacles.items.length;j++){const o=obstacles.items[j];if(o.x<nearest&&overlaps(sweep,o)){nearest=o.x;target=j;}}
+      if(target>=0){const o=obstacles.items[target];o.hp--;burst(o.x+o.w/2,b.y,C.pink,12);if(o.hp<=0){addScore(60,o.x,o.y-10);obstacles.remove(target);shake(3);}lasers.remove(i);}
+      else if(b.x>W+100)lasers.remove(i);
+    }
+    const pb=body();
+    for(let i=hostile.items.length-1;i>=0;i--){const b=hostile.items[i];b.x+=b.vx*worldDt;b.y+=b.vy*worldDt;
+      if(overlaps(pb,{x:b.x-7,y:b.y-5,w:14,h:10})){hostile.remove(i);hit();if(state!=='playing')return;}
+      else if(b.x<-50||b.y>H+50||b.y<-50)hostile.remove(i);
+    }
+    for(let i=pickups.items.length-1;i>=0;i--){
+      const item=pickups.items[i];item.x-=travel;item.phase+=dt*3;
+      if(item.kind==='coin'&&player.magnet>0){const dx=pb.x+pb.w/2-item.x,dy=pb.y+pb.h/2-item.y,dist=Math.hypot(dx,dy);if(dist<255){const step=Math.min(1,dt*(7+500/Math.max(25,dist)));item.x+=dx*step;item.y+=dy*step;}}
+      const nearX=clamp(item.x,pb.x,pb.x+pb.w),nearY=clamp(item.y,pb.y,pb.y+pb.h);
+      if(Math.hypot(item.x-nearX,item.y-nearY)<item.r+3){collect(item);pickups.remove(i);}
+      else if(item.x<-60)pickups.remove(i);
+    }
+    for(const o of obstacles.items){const inset=o.kind.startsWith('bird')?7:4;if(overlaps(pb,{x:o.x+inset,y:o.y+4,w:o.w-inset*2,h:o.h-6})){hit();if(state!=='playing')return;}}
+  }
+  function updateEffects(dt){
+    run.shake=Math.max(0,run.shake-dt*30);run.flash=Math.max(0,run.flash-dt);
+    for(let i=particles.items.length-1;i>=0;i--){const p=particles.items[i];p.life-=dt;p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=420*dt;if(p.life<=0)particles.remove(i);}
+    for(let i=labels.items.length-1;i>=0;i--){const l=labels.items[i];l.life-=dt;l.y-=34*dt;if(l.life<=0)labels.remove(i);}
+  }
+  function updateHUD(){
+    $('score').textContent=pad(run.score);$('best').textContent=pad(Math.max(records[mode],run.score));$('multi').textContent='×'+run.multiplier;
+    $('clock').textContent=run.time.toFixed(1);$('timer').classList.toggle('low',run.time<10);
+    $('abilityStatus').textContent=player.cooldown>0?(mode==='shooter'?'FIRING':player.cooldown.toFixed(1)+'s RECHARGE'):'READY';
+    $('abilityFill').style.width=(1-player.cooldown/(mode==='shooter'?.20:8))*100+'%';
+    for(const [key,id] of [['shield','shieldChip'],['slow','slowChip'],['magnet','magnetChip'],['jet','jetChip']]){
+      const active=!!player[key];$(id).classList.toggle('active',active);$(id).querySelector('b').textContent=active?(key==='shield'?'1 HIT':player[key].toFixed(1)+'s'):'';
+    }
+    $('hint').textContent=run.elapsed<6?(mode==='shooter'?'HOLD X / SHIFT TO FIRE · JUMP OR DUCK TO DODGE':mode==='time'?'BATTERIES +5s · COLLISIONS −5s · X TO PHASE':'HOLD JUMP FOR HEIGHT · DUCK UNDER LOW BIRDS · X TO PHASE'):player.landing&&player.jet<=0?'SAFE LANDING':run.multiplier>1?'TOKEN CHAIN · '+run.multiplier+'× POINTS':'';
+  }
+
+  // Deterministic scenery seeds: no random geometry flicker between frames.
+  const fract=n=>n-Math.floor(n), seed=n=>fract(Math.sin(n*127.1+311.7)*43758.5453);
+  const stars=Array.from({length:65},(_,i)=>({x:seed(i+1),y:seed(i+91)*.61,r:seed(i+190)*1.2+.35}));
+  function polygon(points,fill,stroke){ctx.beginPath();points.forEach(([x,y],i)=>i?ctx.lineTo(x,y):ctx.moveTo(x,y));ctx.closePath();ctx.fillStyle=fill;ctx.fill();if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=1.4;ctx.stroke();}}
+  function glow(color,blur=14){ctx.shadowColor=color;ctx.shadowBlur=fx?blur:0;}
+  function roundRect(x,y,w,h,r,fill,stroke){ctx.beginPath();ctx.roundRect(x,y,w,h,r);if(fill){ctx.fillStyle=fill;ctx.fill();}if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=1.5;ctx.stroke();}}
+  function background(){
+    const night=(Math.cos((state==='menu'?visualTime*.15:run.elapsed)*.07)+1)/2;
+    const sky=ctx.createLinearGradient(0,0,0,GROUND);sky.addColorStop(0,`rgb(${9+Math.round((1-night)*19)},${12+Math.round((1-night)*7)},${29+Math.round((1-night)*15)})`);sky.addColorStop(.6,night>.5?'#1d183b':'#482644');sky.addColorStop(1,'#14293d');ctx.fillStyle=sky;ctx.fillRect(0,0,W,H);
+    ctx.fillStyle='#c4e6ff';for(const s of stars){ctx.globalAlpha=(.25+night*.6)*(.6+.4*Math.sin(visualTime*.6+s.x*30));ctx.fillRect((s.x*W-scenery*.012%W+W)%W,s.y*GROUND,s.r,s.r);}ctx.globalAlpha=1;
+    const sx=W*.77,sy=205,r=87;
+    const halo=ctx.createRadialGradient(sx,sy,5,sx,sy,190);halo.addColorStop(0,'#d781772b');halo.addColorStop(1,'#db738000');ctx.fillStyle=halo;ctx.fillRect(sx-190,sy-190,380,380);
+    ctx.save();ctx.beginPath();ctx.arc(sx,sy,r,0,Math.PI*2);ctx.clip();const sun=ctx.createLinearGradient(0,sy-r,0,sy+r);sun.addColorStop(0,'#ffd98c');sun.addColorStop(.6,'#fa87b0');sun.addColorStop(1,'#b34dbe');ctx.fillStyle=sun;ctx.globalAlpha=.84;ctx.fillRect(sx-r,sy-r,r*2,r*2);ctx.fillStyle='#241b3c';for(let i=0;i<8;i++)ctx.fillRect(sx-r,sy+i*13,r*2,2+i*.7);ctx.restore();
+    for(let layer=0;layer<3;layer++){
+      const spacing=layer===0?95:layer===1?76:118,factor=[.07,.16,.30][layer],base=[GROUND-56,GROUND-23,GROUND][layer];
+      const offset=scenery*factor,first=Math.floor(offset/spacing);
+      for(let i=-1;i<W/spacing+2;i++){
+        const n=i+first,x=i*spacing-offset%spacing,w=spacing-9,h=45+seed(n+layer*93+40)*[160,165,102][layer];
+        ctx.fillStyle=['#171d36','#17233b','#0b192b'][layer];ctx.fillRect(x,base-h,w,h);
+        ctx.strokeStyle=['#343452','#33425e','#285061'][layer];ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(x,base);ctx.lineTo(x,base-h);ctx.lineTo(x+w,base-h);ctx.lineTo(x+w,base);ctx.stroke();
+        if(seed(n+4)>.55){ctx.strokeStyle='#344660';ctx.beginPath();ctx.moveTo(x+w*.5,base-h);ctx.lineTo(x+w*.5,base-h-20);ctx.stroke();}
+        if(layer>0){for(let col=0;col<3;col++)for(let row=0;row<h/19-1;row++)if(seed(n*19+col*3+row*7)>.53){ctx.fillStyle=seed(n+col)>.5?'#5eb9bd45':'#b069bb44';ctx.fillRect(x+12+col*(w-20)/3,base-h+12+row*19,4,6);}}
+        if(layer===2&&seed(n+50)>.68){ctx.fillStyle='#ad76db8c';ctx.fillRect(x+5,base-h+15,3,Math.min(45,h-20));}
+      }
+    }
+    const ground=ctx.createLinearGradient(0,GROUND,0,H);ground.addColorStop(0,'#122838');ground.addColorStop(1,'#08101f');ctx.fillStyle=ground;ctx.fillRect(0,GROUND,W,H-GROUND);
+    ctx.strokeStyle='#33516670';ctx.lineWidth=1;for(let i=-12;i<=12;i++){ctx.beginPath();ctx.moveTo(W*.5+i*27,GROUND);ctx.lineTo(W*.5+i*160,H);ctx.stroke();}
+    for(let i=0;i<9;i++){const f=(i/9+scenery*.00016)%1,y=GROUND+f*f*(H-GROUND);ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+    glow(C.cyan,10);ctx.fillStyle='#71dfd4';ctx.fillRect(0,GROUND,W,2);ctx.shadowBlur=0;
+    ctx.fillStyle='#6e9fa957';for(let x=-scenery%100;x<W;x+=100)ctx.fillRect(x,GROUND+10,37,2);
+  }
+  function drawDino(x,feet,scale=1,duck=false,hero=false){
+    const t=state==='paused'||state==='over'?run.elapsed:visualTime,air=!hero&&player.y<GROUND-2;
+    ctx.save();ctx.translate(x,feet);ctx.scale(scale,scale);
+    if(!hero&&player.inv>0&&Math.floor(visualTime*16)%2===0)ctx.globalAlpha=.35;
+    if(!hero&&player.phase>0){ctx.globalAlpha=.65;glow(C.violet,25);}
+    const stride=air?0:Math.sin(t*(hero?5:19))*9,bob=air?0:Math.abs(Math.sin(t*9))*1.3;
+    ctx.translate(0,-bob);if(duck){ctx.translate(0,-3);ctx.scale(1.17,.49);}
+    if(!hero&&(player.shield||player.phase>0||player.landing)){
+      ctx.save();glow(player.shield?C.blue:C.violet,17);ctx.strokeStyle=player.shield?C.blue:C.violet;ctx.lineWidth=1.8;ctx.beginPath();ctx.ellipse(35,-37,48,46,0,0,Math.PI*2);ctx.stroke();ctx.restore();
+    }
+    // Tail, articulated legs, torso, large muzzle, visor, teeth, and tiny forearm.
+    polygon([[27,-42],[8,-39],[-17,-54],[-9,-30],[17,-20],[37,-27]],'#31b9ab','#92ffdf');
+    polygon([[26,-25],[38,-21],[31+stride,-5],[40+stride,-5],[40+stride,0],[23+stride,0],[20+stride,-9]],'#35998f');
+    polygon([[41,-27],[52,-23],[46-stride,-5],[56-stride,-5],[56-stride,0],[39-stride,0],[35-stride,-11]],'#80f6cf');
+    const bodyGradient=ctx.createLinearGradient(15,-68,54,-12);bodyGradient.addColorStop(0,'#a0ffe0');bodyGradient.addColorStop(1,'#2cc1b0');
+    polygon([[18,-47],[35,-56],[39,-76],[68,-76],[78,-66],[78,-45],[60,-45],[58,-30],[45,-17],[25,-20],[16,-32]],bodyGradient,'#aeffe7');
+    polygon([[20,-32],[37,-31],[51,-41],[57,-37],[49,-23],[39,-18],[25,-21]],'#1a877f');
+    roundRect(43,-68,33,12,3,'#101c36','#75ffe6');glow(C.cyan,8);ctx.fillStyle='#caffff';ctx.fillRect(53,-65,19,3);ctx.shadowBlur=0;
+    ctx.fillStyle='#092f39';ctx.fillRect(64,-50,14,3);ctx.fillStyle='#d3fff0';ctx.fillRect(66,-49,3,4);ctx.fillRect(73,-49,3,3);
+    polygon([[53,-37],[63,-34],[66,-28],[62,-25],[60,-30],[51,-30]],'#89f7cf');
+    for(let i=0;i<3;i++)polygon([[20+i*6,-49-i*4],[18+i*6,-57-i*4],[27+i*6,-52-i*4]],'#b499ff');
+    if(!hero&&mode==='shooter'){roundRect(57,-37,25,10,2,'#182c46','#a7b8df');glow(C.cyan);ctx.fillStyle=C.cyan;ctx.fillRect(76,-35,9,5);ctx.shadowBlur=0;}
+    if(!hero&&player.jet>0){roundRect(9,-47,14,26,3,'#28344c',C.gold);glow(C.gold);polygon([[10,-20],[14,-2+Math.sin(t*50)*8],[21,-20]],C.gold);ctx.shadowBlur=0;}
+    ctx.restore();
+  }
+  function drawObstacle(o){
+    ctx.save();ctx.translate(o.x,o.y);
+    if(o.kind.startsWith('bird')){
+      const flap=Math.sin(o.phase)*17;glow(C.pink,9);polygon([[2,15],[23,8],[48,12],[59,21],[38,22],[20,28]],'#b870b9','#ffafed');
+      polygon([[22,17],[7,-7+flap],[36,10]],'#623e81','#c57ac7');polygon([[31,17],[39,-15-flap],[50,14]],'#9855a0','#e59bdb');ctx.shadowBlur=0;ctx.fillStyle='#ffe6ae';ctx.fillRect(43,13,5,3);
+      if(mode==='shooter'){ctx.fillStyle=C.pink;ctx.fillRect(10,24,13,4);}
+    }else if(o.kind==='barrier'){
+      roundRect(0,0,o.w,o.h,4,'#392744',o.hp===2?C.pink:C.gold);ctx.fillStyle='#fa73d333';ctx.fillRect(5,5,o.w-10,o.h-10);ctx.strokeStyle=C.pink;ctx.lineWidth=3;
+      ctx.beginPath();ctx.moveTo(9,14);ctx.lineTo(o.w-9,o.h-14);ctx.moveTo(o.w-9,14);ctx.lineTo(9,o.h-14);ctx.stroke();ctx.fillStyle=C.gold;for(let i=0;i<o.hp;i++)ctx.fillRect(12+i*14,-8,9,3);
+    }else{
+      const color=o.kind==='hurdle'?C.violet:C.pink;glow(color,8);roundRect(o.w*.32,0,o.w*.38,o.h,3,'#583156',color);
+      ctx.strokeStyle=color;ctx.lineWidth=6;ctx.lineJoin='round';ctx.beginPath();ctx.moveTo(o.w*.38,o.h*.57);ctx.lineTo(3,o.h*.57);ctx.lineTo(3,o.h*.3);ctx.moveTo(o.w*.7,o.h*.72);ctx.lineTo(o.w-2,o.h*.72);ctx.lineTo(o.w-2,o.h*.43);ctx.stroke();ctx.shadowBlur=0;
+    }ctx.restore();
+  }
+  function drawPickup(o){
+    ctx.save();ctx.translate(o.x,o.y);const r=o.r;
+    if(o.kind==='coin'){glow(C.gold,9);ctx.strokeStyle=C.gold;ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(0,0,Math.max(3,Math.abs(Math.cos(o.phase))*r),r,0,0,Math.PI*2);ctx.stroke();ctx.fillStyle='#ffdb7830';ctx.fill();ctx.fillStyle=C.gold;ctx.fillRect(-1,-4,2,8);}
+    else{const color={shield:C.blue,slow:C.violet,magnet:C.pink,jet:C.gold,battery:C.gold}[o.kind];glow(color,12);ctx.rotate(Math.PI/4);roundRect(-r,-r,r*2,r*2,4,'#142335',color);ctx.rotate(-Math.PI/4);ctx.shadowBlur=0;ctx.fillStyle=color;ctx.font='bold 21px system-ui';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText({shield:'◇',slow:'◷',magnet:'∩',jet:'↑',battery:'+'}[o.kind],0,0);}
+    ctx.restore();
+  }
+  function draw(){
+    ctx.setTransform(dpr*stage.clientWidth/W,0,0,dpr*stage.clientHeight/H,0,0);ctx.clearRect(0,0,W,H);ctx.save();
+    if(run.shake>0&&fx)ctx.translate(rand(-run.shake,run.shake),rand(-run.shake/2,run.shake/2));background();
+    if(state==='menu'){
+      const scale=W>850?2.55:W>600?2.15:1.7,x=W>600?W*.75:W*.79;
+      ctx.save();ctx.globalAlpha=W>600?1:.35;ctx.fillStyle='#76ffe01a';ctx.beginPath();ctx.ellipse(x+scale*25,330,scale*53,12,0,0,Math.PI*2);ctx.fill();drawDino(x,319,scale,false,true);ctx.font='9px ui-monospace,monospace';ctx.fillStyle='#91b7bd';ctx.textAlign='center';ctx.fillText('SPECIMEN RX-01 / STILL RUNNING',x+scale*25,354);ctx.restore();
+    }else{
+      ctx.fillStyle='#76ffe01a';ctx.beginPath();ctx.ellipse(player.x+30,GROUND+5,36,5,0,0,Math.PI*2);ctx.fill();
+      for(const o of pickups.items)drawPickup(o);for(const o of obstacles.items)drawObstacle(o);
+      for(const b of lasers.items){glow(C.cyan);roundRect(b.x,b.y-2,24,4,2,'#d7fff6');}ctx.shadowBlur=0;
+      for(const b of hostile.items){glow(C.pink);ctx.fillStyle=C.pink;ctx.beginPath();ctx.ellipse(b.x,b.y,8,5,0,0,Math.PI*2);ctx.fill();}ctx.shadowBlur=0;
+      if(player.phase>0){ctx.save();ctx.globalAlpha=.13;drawDino(player.x-38,player.y,1,player.duck);ctx.restore();}
+      drawDino(player.x,player.y,1,player.duck);
+      if(player.slow>0){ctx.fillStyle='#ad94ff09';ctx.fillRect(0,0,W,H);}
+      if(player.magnet>0){ctx.strokeStyle='#ff91d966';ctx.setLineDash([4,9]);ctx.beginPath();ctx.arc(player.x+33,player.y-36,65+Math.sin(visualTime*5)*5,0,Math.PI*2);ctx.stroke();ctx.setLineDash([]);}
+    }
+    for(const p of particles.items){ctx.globalAlpha=clamp(p.life/p.max,0,1);ctx.fillStyle=p.color;ctx.fillRect(p.x,p.y,p.size,p.size);}ctx.globalAlpha=1;
+    for(const l of labels.items){ctx.globalAlpha=Math.min(1,l.life*2);ctx.fillStyle=l.color;ctx.font='bold 13px ui-monospace,monospace';ctx.textAlign='center';ctx.fillText(l.text,clamp(l.x,85,W-85),l.y);}ctx.globalAlpha=1;
+    if(run.flash>0){ctx.fillStyle=`rgba(255,80,145,${run.flash*.55})`;ctx.fillRect(0,0,W,H);}ctx.restore();
+  }
+  function resize(){
+    const previousX=player.x,oldW=W;W=stage.clientWidth/stage.clientHeight*H;dpr=Math.min(window.devicePixelRatio||1,2);
+    canvas.width=Math.round(stage.clientWidth*dpr);canvas.height=Math.round(stage.clientHeight*dpr);player.x=Math.min(180,W*.18);
+    // Keep relative distances on rotation/resizing; never relocate a hazard onto Rex.
+    if(state!=='menu'&&oldW>0){const ratio=W/oldW;for(const pool of [obstacles,pickups,lasers,hostile])for(const o of pool.items)o.x=player.x+(o.x-previousX)*ratio;}
+  }
+  function updateSettings(){$('soundBtn').textContent=audio.muted?'SOUND OFF':'SOUND ON';$('soundBtn').setAttribute('aria-pressed',String(!audio.muted));$('fxBtn').textContent=fx?'FX ON':'FX OFF';$('fxBtn').setAttribute('aria-pressed',String(fx));}
+
+  // Multiple simultaneous key/pointer sources are tracked separately, avoiding stuck
+  // controls when Space+W or two fingers are used and only one is released.
+  const keyActions={Space:'jump',ArrowUp:'jump',KeyW:'jump',ArrowDown:'duck',KeyS:'duck',KeyX:'ability',ShiftLeft:'ability',ShiftRight:'ability'};
+  addEventListener('keydown',e=>{
+    if(e.code==='Tab'&&(state==='paused'||state==='over')){const buttons=[...(state==='paused'?$('pauseOverlay'):$('overOverlay')).querySelectorAll('button')];const first=buttons[0],last=buttons[buttons.length-1];if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}return;}
+    if(e.repeat){if(keyActions[e.code]&&state==='playing')e.preventDefault();return;}
+    if(e.code==='KeyM'){e.preventDefault();audio.toggle();return;}
+    if(e.code==='Escape'||e.code==='KeyP'){e.preventDefault();pause();return;}
+    if(e.code==='Enter'&&e.target.tagName!=='BUTTON'){if(state==='menu'||state==='over'){e.preventDefault();start();}else if(state==='paused')pause();return;}
+    const action=keyActions[e.code];if(action&&state==='playing'){e.preventDefault();audio.unlock();press(action,'key:'+e.code);}
+  });
+  addEventListener('keyup',e=>{const action=keyActions[e.code];if(action){release(action,'key:'+e.code);if(state==='playing')e.preventDefault();}});
+  function bindPointer(element,action){
+    element.addEventListener('pointerdown',e=>{if(state!=='playing'||(e.pointerType==='mouse'&&e.button!==0))return;e.preventDefault();audio.unlock();element.setPointerCapture(e.pointerId);press(action,'pointer:'+e.pointerId);element.classList.add('pressed');});
+    const up=e=>{release(action,'pointer:'+e.pointerId);element.classList.remove('pressed');};
+    element.addEventListener('pointerup',up);element.addEventListener('pointercancel',up);element.addEventListener('lostpointercapture',up);
+  }
+  bindPointer(canvas,'jump');document.querySelectorAll('[data-action]').forEach(b=>bindPointer(b,b.dataset.action));
+  document.querySelectorAll('[data-mode]').forEach(b=>b.addEventListener('click',()=>selectMode(b.dataset.mode)));
+  $('startBtn').onclick=start;$('retryBtn').onclick=start;$('pauseBtn').onclick=pause;$('resumeBtn').onclick=pause;$('pauseMenuBtn').onclick=mainMenu;$('overMenuBtn').onclick=mainMenu;
+  $('soundBtn').onclick=()=>{audio.toggle();$('soundBtn').blur();};$('fxBtn').onclick=()=>{fx=!fx;storage.set('fx',fx?'1':'0');updateSettings();$('fxBtn').blur();};
+  addEventListener('blur',()=>{if(state==='playing')setState('paused');else clearInput();});
+  document.addEventListener('visibilitychange',()=>{if(document.hidden&&state==='playing')setState('paused');});
+  new ResizeObserver(resize).observe(stage);
+  function frame(timestamp){
+    const dt=lastTime?Math.min((timestamp-lastTime)/1000,.075):0;lastTime=timestamp;
+    if(state!=='paused')visualTime+=dt;
+    if(state==='playing'){
+      accumulator+=dt;while(accumulator>=STEP&&state==='playing'){update(STEP);updateEffects(STEP);accumulator-=STEP;}
+      hudTime+=dt;if(hudTime>=.05){updateHUD();hudTime=0;}
+    }else{accumulator=0;if(state==='menu')scenery+=dt*35;if(state!=='paused')updateEffects(dt);}
+    draw();requestAnimationFrame(frame);
+  }
+  updateSettings();selectMode(mode);resize();requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
