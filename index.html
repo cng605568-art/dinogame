@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="google-site-verification" content="crehwRvv3FsKxCFfgVztVa5TDKTArhq9deHWN6scXVQ" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#080b14">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>NEON REX — Outrun Extinction</title>
+<style>
+  :root{color-scheme:dark;--bg:#080b14;--panel:#101622;--line:#25303d;--text:#edf8fb;--muted:#93a5b6;--cyan:#76ffe0;--pink:#fa73d3;--gold:#ffdb78;--violet:#ad94ff}
+  *{box-sizing:border-box} [hidden]{display:none!important}
+  body{margin:0;background:radial-gradient(ellipse at 75% 20%,#1c1535 0,transparent 48%),var(--bg);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100svh}
+  button{font:inherit;color:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent} button:focus-visible{outline:2px solid var(--cyan);outline-offset:5px}
+  button:disabled{cursor:default;opacity:.45} button,canvas{touch-action:manipulation}
+  .app{max-width:1328px;margin:auto;padding:28px 40px 20px} .topbar{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:25px}
+  .brand{display:flex;gap:12px;align-items:center;font-size:19px;font-weight:900;letter-spacing:-.7px}.brand-mark{display:grid;place-items:center;width:38px;height:38px;border:1px solid #76ffe04a;background:#76ffe012;color:var(--cyan);border-radius:11px;font-size:25px}
+  .brand small{display:block;font:9px ui-monospace,monospace;color:var(--muted);letter-spacing:2.4px;margin-top:4px}.top-actions{display:flex;gap:9px}.tool{border:1px solid var(--line);background:#111722;border-radius:9px;padding:10px 13px;font:10px ui-monospace,monospace;letter-spacing:1px;transition:border-color .2s}.tool:hover{border-color:var(--cyan)}
+  .section-line{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;font:10px ui-monospace,monospace;letter-spacing:2px;color:var(--muted)}.live{color:var(--cyan)}.live:before{content:"";display:inline-block;width:6px;height:6px;background:var(--cyan);border-radius:50%;margin-right:9px;box-shadow:0 0 10px #76ffe099}
+  .stage{position:relative;height:620px;border:1px solid #304052;border-radius:20px;overflow:hidden;background:#090e1d;box-shadow:0 24px 100px #0005;isolation:isolate}
+  canvas{display:block;width:100%;height:100%;touch-action:none;outline:none}.scanlines{position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(transparent 0 3px,#0000000a 3px 4px);z-index:1}
+  .menu{position:absolute;inset:0;padding:36px 40px 24px;background:linear-gradient(90deg,#080e1eed 0%,#080e1e9c 42%,transparent 76%);z-index:3;display:flex;flex-direction:column}
+  .eyebrow{font:10px ui-monospace,monospace;letter-spacing:3px;color:var(--cyan);margin:0 0 16px}.eyebrow span{display:inline-block;width:24px;height:1px;vertical-align:middle;margin-right:10px;background:var(--cyan)}
+  h1{font-size:clamp(54px,6.4vw,88px);line-height:.95;letter-spacing:-5px;margin:0;font-weight:950}h1 em{font-style:normal;color:var(--cyan);text-shadow:0 0 40px #76ffe021}
+  .intro p{font-size:13px;line-height:1.7;color:#adbccd;max-width:365px;margin:17px 0 0}.intro{min-height:260px}.choose-label{font:9px ui-monospace,monospace;color:var(--muted);letter-spacing:2px;margin:6px 0 11px}
+  .modes{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.mode{position:relative;text-align:left;min-height:105px;padding:16px;border:1px solid #354055;border-radius:11px;background:#0c1422e8;transition:background .2s,border-color .2s,transform .2s}
+  .mode:hover{transform:translateY(-2px);border-color:#77879e}.mode[aria-pressed="true"]{border-color:var(--cyan);background:#12312fe8;box-shadow:inset 0 0 22px #76ffe006}.mode-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}.mode-index{font:10px ui-monospace,monospace;color:var(--cyan)}.radio{border:1px solid #687887;border-radius:50%;width:12px;height:12px}.mode[aria-pressed="true"] .radio{background:var(--cyan);border:3px solid #254d45;box-shadow:0 0 0 1px var(--cyan)}.mode strong{display:block;font-size:15px;font-weight:700;margin-bottom:5px}.mode small{font-size:10px;color:#a9bbcb}
+  .menu-bottom{display:flex;align-items:center;gap:23px;margin-top:22px}.primary{display:flex;align-items:center;justify-content:space-between;gap:30px;border:0;border-radius:9px;background:var(--cyan);color:#082420;padding:18px 24px;font-size:12px;font-weight:850;letter-spacing:1px;box-shadow:0 0 30px #76ffe014;transition:filter .2s,transform .2s}.primary:hover{filter:brightness(1.1);transform:translateY(-1px)}.primary b{font-size:19px;line-height:14px}.mode-note{font-size:11px;color:#adbecb;line-height:1.7;max-width:290px}.menu-foot{margin-top:auto;padding-top:17px;display:flex;justify-content:space-between;font:9px ui-monospace,monospace;color:#7e92a7;letter-spacing:1.3px}
+  .hud{position:absolute;inset:25px 27px auto;z-index:2;display:flex;justify-content:space-between;gap:12px;pointer-events:none}.hud-left,.hud-right{display:flex;gap:28px;align-items:flex-start}.metric label{display:block;color:#a5b7cc;font:9px ui-monospace,monospace;letter-spacing:2px;margin-bottom:5px}.metric strong{font:700 31px ui-monospace,monospace;letter-spacing:-1px}.metric.small strong{font-size:20px;color:#b9c9dd}.multiplier{font:700 12px ui-monospace,monospace;color:var(--gold);background:#ffdb7812;border:1px solid #ffdb7838;padding:7px 10px;border-radius:7px;margin-top:12px}.hud button{pointer-events:auto}.timer.low strong{color:#ff7096}.ability{width:120px;font:9px ui-monospace,monospace;letter-spacing:1px;color:var(--cyan);margin-top:3px}.ability b{display:block;font-size:11px;margin-top:7px}.meter{display:block;height:3px;background:#ffffff1c;margin-top:8px;border-radius:3px;overflow:hidden}.meter i{display:block;background:var(--cyan);height:100%;width:100%}.pause-button{font-size:16px;padding:8px 13px}
+  .power-rack{position:absolute;left:25px;bottom:23px;right:25px;display:flex;gap:7px;z-index:2;pointer-events:none}.power-chip{font:10px ui-monospace,monospace;color:#718394;padding:8px 10px;background:#090f1ddb;border:1px solid #364358;border-radius:6px}.power-chip.active{color:var(--power);border-color:var(--power);box-shadow:0 0 15px #ffffff09}.power-chip b{font-weight:400;margin-left:6px}.run-hint{position:absolute;left:0;right:0;top:105px;text-align:center;font:11px ui-monospace,monospace;color:#b8cddd;pointer-events:none;z-index:2;letter-spacing:1px}
+  .overlay{position:absolute;inset:0;display:grid;place-items:center;z-index:5;background:#070c19ad;backdrop-filter:blur(9px);padding:22px}.dialog{width:min(410px,100%);border:1px solid #435366;background:linear-gradient(140deg,#172232f7,#0b1220f7);border-radius:18px;padding:33px;text-align:center;box-shadow:0 20px 100px #0007}.dialog h2{font-size:46px;line-height:1;letter-spacing:-2px;margin:12px 0 14px}.dialog p{font-size:12px;line-height:1.7;color:#b1c2d0}.dialog .primary{width:100%;margin-top:22px}.secondary{border:1px solid #394658;background:transparent;border-radius:8px;font-size:11px;padding:12px 20px;width:100%;margin-top:10px;color:#b6c6d5}.secondary:hover{border-color:#96adbc}.results{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:23px 0}.results strong{font:700 22px ui-monospace,monospace;display:block;color:var(--cyan)}.results small{display:block;font:9px ui-monospace,monospace;color:var(--muted);letter-spacing:1px;margin-top:7px}
+  .controls{display:flex;justify-content:space-between;gap:14px;padding:19px 2px;color:#9bafc2;font-size:10px}.keys{display:flex;gap:20px;flex-wrap:wrap}.keys span{white-space:nowrap}kbd{display:inline-block;font:10px ui-monospace,monospace;background:#151e2b;border:1px solid #354255;border-bottom-width:2px;border-radius:4px;padding:4px 6px;color:#d4e5ef;margin-right:4px}.control-note{color:#698196;font:9px ui-monospace,monospace;align-self:center;letter-spacing:1px}
+  .power-guide{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;border-top:1px solid #202b39;padding:23px 0 8px}.guide{display:flex;align-items:center;gap:12px}.guide-icon{width:34px;height:34px;display:grid;place-items:center;background:#ffffff04;border:1px solid #ffffff19;border-radius:9px;color:var(--power);font-size:20px}.guide strong{display:block;font-size:11px;font-weight:600}.guide small{display:block;font-size:10px;color:#8396ac;margin-top:5px}.touch-controls{display:none;gap:10px;padding-top:12px}.touch-controls button{flex:1;touch-action:none;user-select:none;border:1px solid #3a5065;background:#142030;border-radius:10px;padding:16px 4px;color:var(--cyan);font:700 11px ui-monospace,monospace}.touch-controls button.pressed{background:#235747}.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
+  @media(max-width:900px){.app{padding:20px}.stage{height:600px}.menu{padding:30px}.intro{min-height:255px}h1{font-size:68px}.control-note{display:none}.power-guide{gap:12px}.guide{gap:8px}.guide small{font-size:9px}.hud-left,.hud-right{gap:14px}}
+  @media(max-width:600px){.app{padding:16px 12px}.topbar{margin-bottom:20px}.brand{font-size:16px}.brand small{font-size:8px}.brand-mark{width:32px;height:32px}.tool{padding:9px;font-size:9px}.section-line{font-size:8px;letter-spacing:1px}.stage{height:690px;border-radius:15px}.app[data-state="playing"] .stage,.app[data-state="paused"] .stage,.app[data-state="over"] .stage{height:440px}.menu{padding:25px 21px;background:linear-gradient(90deg,#080e1ee8,#080e1e65)}.intro{min-height:252px}h1{font-size:57px;letter-spacing:-3.5px}.intro p{max-width:230px;font-size:12px}.eyebrow{font-size:8px;letter-spacing:2px}.modes{grid-template-columns:1fr;gap:8px}.mode{min-height:73px;padding:13px 14px 13px 45px}.mode-top{position:absolute;left:14px;top:18px;margin:0}.mode-index{font-size:10px}.radio{display:none}.mode strong{font-size:13px}.mode small{font-size:10px}.menu-bottom{gap:13px;margin-top:17px;align-items:stretch}.menu-bottom .primary{padding:15px 17px;gap:18px;font-size:10px;flex-shrink:0}.mode-note{font-size:9px;line-height:1.6}.menu-foot{font-size:7px;letter-spacing:.6px;padding-top:13px}.menu-foot span:last-child{display:none}.hud{inset:17px 15px auto}.hud-left,.hud-right{gap:12px}.metric label{font-size:7px;letter-spacing:1px}.metric strong{font-size:22px}.metric.small strong{font-size:14px}.multiplier{font-size:9px;padding:5px;margin-top:10px}.ability{position:absolute;right:0;top:55px;width:92px;font-size:8px}.ability b{font-size:9px}.pause-button{font-size:13px;padding:7px 10px}.power-rack{left:13px;right:13px;bottom:16px;gap:5px;flex-wrap:wrap}.power-chip{font-size:8px;padding:6px}.run-hint{top:99px;font-size:8px;letter-spacing:0}.controls{padding:15px 0;font-size:9px}.keys{gap:8px}.keys span:last-child{display:none}kbd{font-size:8px;padding:3px 4px}.power-guide{grid-template-columns:repeat(2,1fr);gap:17px 12px;padding-top:18px}.touch-controls{display:flex}.dialog{padding:25px}.dialog h2{font-size:38px}}
+  @media(pointer:coarse){.touch-controls{display:flex}.controls .keys{opacity:.65}}
+  @media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;transition:none!important}}
+  /* Touch layout fills the usable viewport; menus remain freely scrollable. */
+  html{overflow-x:hidden}body{overscroll-behavior-y:contain}
+  .touch-controls button{-webkit-user-select:none;-webkit-touch-callout:none;min-height:76px;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:7px}
+  .touch-controls button small{font:8px ui-monospace,monospace;letter-spacing:.5px;color:#b4c8d7}
+  .touch-controls button[data-action="jump"]{background:#76ffe0;color:#082420;border-color:#acffeb;font-size:15px}
+  .touch-controls button[data-action="jump"] small{color:#185b50}
+  .touch-controls button[data-action="jump"].pressed{background:#bcffee;box-shadow:0 0 24px #76ffe055}
+  .touch-controls button[data-action="ability"].cooling{border-color:#635087;color:#cbb8ef}
+  .touch-copy{display:none;font-size:11px;line-height:1.8;color:#adbfce}
+  .app[data-touch="true"] .touch-copy{display:block}
+  .app[data-touch="true"] .keys,.app[data-touch="true"] .control-note{display:none}
+  .app[data-touch="true"] .touch-controls{display:grid;grid-template-columns:1fr 1fr 1.45fr}
+  .app[data-touch="true"][data-state="menu"] .touch-controls{display:none}
+  .app[data-touch="true"] .tool{min-width:44px;min-height:44px}
+  .app[data-touch="true"] .mode:hover,.app[data-touch="true"] .primary:hover{transform:none}
+  body.mobile-session{overflow:hidden;overscroll-behavior:none}
+  body.mobile-session .app{position:fixed;inset:0;max-width:none;height:var(--app-height,100dvh);width:100%;margin:0;display:flex;flex-direction:column;gap:0;padding:max(8px,env(safe-area-inset-top)) max(10px,env(safe-area-inset-right)) max(10px,env(safe-area-inset-bottom)) max(10px,env(safe-area-inset-left));background:#080b14}
+  body.mobile-session .topbar{flex:0 0 auto;margin-bottom:7px;gap:8px}
+  body.mobile-session .brand{font-size:15px;gap:8px}
+  body.mobile-session .brand small{display:none}
+  body.mobile-session .brand-mark{width:30px;height:30px;font-size:20px}
+  body.mobile-session .top-actions{gap:5px}
+  body.mobile-session .tool{font-size:9px;padding:9px}
+  body.mobile-session .section-line{flex:0 0 auto;margin:0 1px 8px;font-size:8px;letter-spacing:1px}
+  body.mobile-session .stage{flex:1 1 0;min-height:0;height:auto!important;border-radius:12px;box-shadow:none}
+  body.mobile-session .touch-controls{flex:0 0 auto;padding-top:9px;gap:8px}
+  body.mobile-session .controls,body.mobile-session .power-guide{display:none}
+  body.mobile-session .hud{inset:14px 13px auto;gap:8px}
+  body.mobile-session .hud-left,body.mobile-session .hud-right{gap:9px}
+  body.mobile-session .metric label{font-size:7px;letter-spacing:1px}
+  body.mobile-session .metric strong{font-size:22px}
+  body.mobile-session .metric.small strong{font-size:15px}
+  body.mobile-session .multiplier{font-size:10px;padding:6px;margin-top:9px}
+  body.mobile-session .pause-button{font-size:17px;min-height:44px;min-width:44px}
+  body.mobile-session .ability{top:57px;right:0;position:absolute;width:95px;font-size:8px}
+  body.mobile-session .ability b{font-size:10px}
+  body.mobile-session .run-hint{top:110px;padding:0 15px;font-size:9px;line-height:1.7;letter-spacing:0}
+  body.mobile-session .power-rack{left:12px;right:12px;bottom:12px;gap:5px;flex-wrap:wrap}
+  body.mobile-session .power-chip{font-size:8px;padding:7px}
+  body.mobile-session .overlay{position:fixed;inset:0;z-index:20;padding:max(16px,env(safe-area-inset-top)) max(16px,env(safe-area-inset-right)) max(16px,env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left));overflow:auto;touch-action:pan-y}
+  body.mobile-session .dialog{max-height:calc(var(--app-height,100dvh) - 48px);overflow:auto;-webkit-overflow-scrolling:touch;padding:25px}
+  body.mobile-session .dialog h2{font-size:39px}
+  @media(max-width:600px){
+    .app{padding:16px max(12px,env(safe-area-inset-right)) max(16px,env(safe-area-inset-bottom)) max(12px,env(safe-area-inset-left))}
+    .menu{padding:24px 20px;overflow-y:auto;-webkit-overflow-scrolling:touch}
+    .intro{min-height:232px;flex-shrink:0}h1{font-size:clamp(46px,14vw,57px)}
+    .modes{flex-shrink:0}.menu-bottom{flex-wrap:wrap;gap:10px;flex-shrink:0}
+    .menu-bottom .primary{width:100%;min-height:51px;font-size:12px}
+    .mode-note{font-size:10px;max-width:none}.menu-foot{margin-top:12px;flex-shrink:0}
+    .topbar{gap:8px}.brand small{letter-spacing:1px}.top-actions{gap:5px}
+  }
+  @media(orientation:landscape) and (max-height:540px){
+    body.mobile-session .section-line{display:none}
+    body.mobile-session .topbar{margin-bottom:4px}
+    body.mobile-session .touch-controls{grid-template-columns:minmax(90px,1fr) minmax(100px,1fr) minmax(145px,1.6fr);gap:12px;padding-top:6px}
+    body.mobile-session .touch-controls button{min-height:60px;padding:8px}
+    body.mobile-session .hud{inset:8px 12px auto}
+    body.mobile-session .ability{position:static;top:auto;width:100px}
+    body.mobile-session .run-hint{top:61px;font-size:8px}
+    body.mobile-session .dialog{padding:15px 24px}
+    body.mobile-session .dialog h2{font-size:28px;margin:7px 0}
+    body.mobile-session .dialog h2 br{display:none}
+    body.mobile-session .dialog p{margin:8px 0;font-size:11px}
+    body.mobile-session .dialog .eyebrow{margin-bottom:8px}
+    body.mobile-session .results{margin:12px 0}
+    body.mobile-session .dialog .primary{margin-top:10px;padding:13px 20px;min-height:44px}
+    body.mobile-session .dialog .secondary{min-height:44px}
+  }
+  @media(max-width:360px){body.mobile-session .hud{inset:10px 9px auto}body.mobile-session .hud-left,body.mobile-session .hud-right{gap:6px}body.mobile-session .metric strong{font-size:19px}body.mobile-session .metric.small strong{font-size:13px}.touch-controls button{font-size:10px}.touch-controls button small{font-size:7px}}
+  /* Campaign UI: readable transmissions, a persistent mission strip, and cinema. */
+  .modes{grid-template-columns:repeat(4,minmax(0,1fr))}.mode[data-mode="story"]{border-color:#8b71b6}.mode[data-mode="story"] .mode-index{color:#c3a4ff}
+  .story-panel{width:min(790px,100%);text-align:left;max-height:100%;overflow-y:auto;overscroll-behavior:contain}
+  .story-panel h2{font-size:37px}.story-panel .eyebrow{margin-bottom:12px;color:#c9b2ff}
+  .story-panel>p{max-width:630px}.chapter-list{display:grid;gap:8px;margin:21px 0}
+  .chapter-pick{display:flex;align-items:center;gap:14px;text-align:left;border:1px solid #34485e;background:#101e2d;border-radius:9px;padding:13px 15px;width:100%;min-height:61px}
+  .chapter-pick:enabled:hover{border-color:#b3a0ee;background:#1e2942}.chapter-pick b{font:700 19px ui-monospace,monospace;color:#b6a4ed}
+  .chapter-pick span{flex:1;font-size:13px}.chapter-pick small{font:8px ui-monospace,monospace;letter-spacing:.6px;color:#9bb8ca}
+  .campaign-actions{display:flex;gap:9px;flex-wrap:wrap}.campaign-actions .primary,.campaign-actions .secondary{width:auto;flex:1;min-width:150px;margin-top:0}
+  .archive{border-top:1px solid #3a465b;margin-top:20px;padding-top:15px;text-align:left;color:#b8c9d8;font-size:12px}.archive summary{cursor:pointer;min-height:35px;color:#c7b0ff;letter-spacing:1px;font-size:10px}
+  .archive article{padding:12px 0;border-top:1px solid #28344a}.archive strong{font-size:11px;color:#c8e5e6}.archive p{font-size:12px;margin:7px 0;line-height:1.8}
+  .story-save{font:9px ui-monospace,monospace!important;letter-spacing:1px;color:#8cbba8!important}
+  .transmission{border-left:2px solid var(--chapter-color,#76ffe0);padding:4px 0 4px 20px;margin:27px 0;min-height:130px}
+  .transmission strong{font:10px ui-monospace,monospace;letter-spacing:1.5px;color:var(--chapter-color,#76ffe0)}
+  .transmission p{font-size:16px;line-height:1.9;color:#d5e4ec;margin:13px 0 0}
+  .mission-note{padding:12px 14px;background:#a38def10;border:1px solid #a38def35;border-radius:7px;font:10px ui-monospace,monospace;line-height:1.8;color:#cdbaff}
+  .brief-footer{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:20px}.brief-footer .primary{margin:0;flex:1}.brief-footer .secondary{width:auto;margin:0}.brief-footer small{font:10px ui-monospace,monospace;color:#90a4ba}
+  .story-hud{position:absolute;top:108px;left:27px;z-index:2;width:min(410px,calc(100% - 54px));border-left:2px solid var(--chapter-color);padding:9px 12px;background:#07111ecf;pointer-events:none}
+  .story-hud>div:first-child{display:flex;justify-content:space-between;gap:10px;font:9px ui-monospace,monospace;letter-spacing:.5px;color:#cbdaea}.story-hearts{color:#ff9bbc;font-size:14px;white-space:nowrap}
+  .story-hud p{font:10px ui-monospace,monospace;line-height:1.6;color:#d4eced;margin:5px 0}.story-hud .meter{margin-top:5px;height:2px}
+  .story-radio{position:absolute;bottom:67px;right:25px;max-width:460px;width:calc(100% - 50px);border:1px solid #577a7970;border-radius:8px;background:#091323eb;padding:11px 15px;z-index:2;pointer-events:none}
+  .story-radio strong{font:9px ui-monospace,monospace;color:#8cddcc;letter-spacing:1px}.story-radio p{font-size:12px;line-height:1.7;margin:5px 0 0;color:#c3d4df}
+  .cinema-ui{position:absolute;inset:0;z-index:4;pointer-events:none}.film-controls{display:flex;gap:7px;position:absolute;top:12px;right:13px;pointer-events:auto}
+  .film-controls button{background:#080d1dcf;min-height:40px;font-size:9px}.film-caption{position:absolute;left:8%;right:8%;bottom:12%;text-align:center;text-shadow:0 2px 8px #000;background:#060b145c;border-radius:7px;padding:8px}
+  .film-caption strong{font:9px ui-monospace,monospace;color:#ffe0a0;letter-spacing:2px}.film-caption p{font-size:clamp(13px,1.55vw,20px);line-height:1.7;margin:9px auto 0;max-width:800px;color:#f4f6ed}
+  .film-shot{position:absolute;bottom:21px;left:22px;font:8px ui-monospace,monospace;letter-spacing:1px;color:#a5adb9}
+  .film-progress{height:2px;position:absolute;left:0;right:0;bottom:0;background:#ffffff16}.film-progress i{display:block;width:0;height:100%;background:#ffdb78}
+  .film-credits{position:absolute;top:25%;left:8%;right:8%;text-align:center;color:#ededd7;text-shadow:0 2px 20px #000}.film-credits h2{font-size:clamp(28px,4vw,60px);line-height:1.1;letter-spacing:-1px;margin:10px 0 20px}.film-credits p{font:10px ui-monospace,monospace;line-height:2;color:#ccd5be}
+  .app[data-film="true"] .touch-controls{display:none}
+  .epilogue-panel{border-color:#acb679;background:linear-gradient(140deg,#28372bf7,#0e1b1ff7)}.epilogue-panel h2{color:#e9edba}.epilogue-panel .eyebrow{color:#d4e5a0}.epilogue-stats{display:flex;gap:26px;margin:22px 0;color:#d4e6b7;font:12px ui-monospace,monospace}
+  body.mobile-session .story-panel{max-height:calc(var(--app-height,100dvh) - 48px);width:min(790px,100%)}
+  body.mobile-session .story-hud{top:110px;left:13px;width:calc(100% - 26px);padding:7px 10px}
+  body.mobile-session .story-hud p{font-size:9px}.app[data-story="true"] .run-hint{display:none}
+  body.mobile-session .story-radio{right:12px;bottom:67px;width:calc(100% - 24px);padding:9px 12px}
+  body.mobile-session .story-radio p{font-size:10px;line-height:1.5}
+  body.mobile-session .film-controls .tool{min-height:44px}.app[data-state="cinematic"] .touch-controls,.app[data-state="briefing"] .touch-controls,.app[data-state="campaign"] .touch-controls,.app[data-state="chapterclear"] .touch-controls,.app[data-state="epilogue"] .touch-controls{display:none}
+  @media(min-width:601px) and (max-width:1000px){.modes{grid-template-columns:repeat(2,minmax(0,1fr))}.intro{min-height:205px}.mode{min-height:86px}.menu{padding-top:27px}.menu-bottom{margin-top:15px}.menu-foot{padding-top:10px}h1{font-size:61px}}
+  @media(max-width:600px){.modes{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.mode{min-height:104px;padding:13px}.mode-top{position:static;margin-bottom:6px}.mode strong{font-size:12px}.mode small{font-size:9px;line-height:1.5;display:block}.intro{min-height:224px}.story-panel,.dialog.story-panel{padding:23px 19px}.story-panel h2{font-size:30px}.chapter-pick{padding:12px 10px;gap:10px}.chapter-pick span{font-size:12px}.chapter-pick small{font-size:7px;max-width:75px;text-align:right}.chapter-pick b{font-size:16px}.transmission{min-height:160px;margin:22px 0;padding-left:14px}.transmission p{font-size:14px;line-height:1.8}.brief-footer .primary{min-width:190px;font-size:10px}.brief-footer .secondary{font-size:10px;min-height:44px}.film-shot{font-size:7px;left:12px}.film-credits p{font-size:8px}.epilogue-stats{font-size:10px;gap:15px}}
+  @media(orientation:landscape) and (max-height:540px){body.mobile-session .story-hud{top:61px;left:12px;width:43%;padding:5px 9px}body.mobile-session .story-hud>div:first-child{font-size:7px}body.mobile-session .story-hud p{font-size:8px;margin:3px 0}body.mobile-session .story-radio{top:65px;bottom:auto;max-height:90px;overflow:hidden;width:44%;padding:6px 9px}body.mobile-session .story-radio p{font-size:9px;line-height:1.4}.film-caption{bottom:11%;padding:3px}.film-caption p{font-size:12px;margin-top:4px}.film-shot{bottom:9px}.film-credits{top:20%}.film-credits h2{font-size:28px;margin:4px 0 8px}.film-credits p{line-height:1.4;font-size:8px}body.mobile-session .transmission{min-height:0;margin:15px 0}}
+</style>
+</head>
+<body>
+<main class="app" id="app" data-state="menu">
+  <header class="topbar">
+    <div class="brand"><span class="brand-mark" aria-hidden="true">↗</span><div>NEON REX<small>THE AFTERHOURS ARCADE</small></div></div>
+    <div class="top-actions"><button class="tool" id="soundBtn" aria-pressed="true" title="Toggle sound (M)">SOUND ON</button><button class="tool" id="fxBtn" aria-pressed="true" title="Toggle screen shake and extra particles">FX ON</button></div>
+  </header>
+  <div class="section-line"><span>01 / OUTRUN EXTINCTION</span><span class="live" id="modeLabel">CLASSIC EVOLVED</span></div>
+  <section class="stage" id="stage" aria-label="Neon Rex arcade game">
+    <canvas id="game" tabindex="0" aria-label="Endless dinosaur runner. Tap and hold to jump; swipe down to fast fall. Touch buttons support simultaneous jump and fire. Keyboard: Space, Up or W jumps; Down or S ducks; X or Shift uses an ability; P or Escape pauses.">This game needs a browser with HTML Canvas support.</canvas>
+    <div class="scanlines"></div>
+    <div class="hud" id="hud" hidden>
+      <div class="hud-left"><div class="metric"><label>SCORE</label><strong id="score">00000</strong></div><span class="multiplier" id="multi">×1</span><div class="metric timer" id="timer" hidden><label>TIME LEFT</label><strong id="clock">45.0</strong></div></div>
+      <div class="hud-right"><div class="metric small"><label>PERSONAL BEST</label><strong id="best">00000</strong></div><div class="ability"><span id="abilityName">PHASE / X</span><b id="abilityStatus">READY</b><span class="meter"><i id="abilityFill"></i></span></div><button class="tool pause-button" id="pauseBtn" title="Pause (P / Escape)" aria-label="Pause game">Ⅱ</button></div>
+    </div>
+    <div class="run-hint" id="hint" hidden></div>
+    <div class="power-rack" id="powerRack" hidden>
+      <span class="power-chip" id="shieldChip" style="--power:#7ccfff">◇ SHIELD<b></b></span><span class="power-chip" id="slowChip" style="--power:#b49aff">◷ CHRONO<b></b></span><span class="power-chip" id="magnetChip" style="--power:#ff91d9">∩ MAGNET<b></b></span><span class="power-chip" id="jetChip" style="--power:#ffdb78">↑ JETPACK<b></b></span>
+    </div>
+    <div class="menu" id="menu">
+      <div class="intro"><div class="eyebrow"><span></span>NO SIGNAL. ALL ADRENALINE.</div><h1>THE FUTURE<br>HAS <em>TEETH.</em></h1><p>A prehistoric icon. A neon afterlife.<br>Jump, blast, and bend time. Make every run count.</p></div>
+      <div class="choose-label">CHOOSE YOUR RUN</div>
+      <div class="modes" aria-label="Game mode">
+        <button class="mode" data-mode="classic" aria-pressed="true"><span class="mode-top"><span class="mode-index">01 /</span><span class="radio"></span></span><strong>Classic Evolved</strong><small>Pure instinct. An endless horizon.</small></button>
+        <button class="mode" data-mode="shooter" aria-pressed="false"><span class="mode-top"><span class="mode-index">02 /</span><span class="radio"></span></span><strong>Cyber-Shooter</strong><small>Less running scared. More lasers.</small></button>
+        <button class="mode" data-mode="time" aria-pressed="false"><span class="mode-top"><span class="mode-index">03 /</span><span class="radio"></span></span><strong>Time Attack</strong><small>45 seconds. Make them legendary.</small></button>
+        <button class="mode" data-mode="story" aria-pressed="false"><span class="mode-top"><span class="mode-index">04 / CAMPAIGN</span><span class="radio"></span></span><strong>The Last Signal</strong><small>Story Mode · Five chapters. One dawn.</small></button>
+      </div>
+      <div class="menu-bottom"><button class="primary" id="startBtn">START GAME <b>↗</b></button><span class="mode-note" id="modeNote">One hit ends the run. Hold jump for height.<br>X / Shift: phase through danger.</span></div>
+      <div class="menu-foot"><span id="menuBest">PERSONAL BEST / 00000</span><span>BUILT FOR ONE MORE TRY.</span></div>
+    </div>
+    <div class="overlay" id="pauseOverlay" hidden><div class="dialog" role="dialog" aria-modal="true" aria-labelledby="pauseTitle"><div class="eyebrow">TAKE A BREATHER</div><h2 id="pauseTitle">TIME IS<br>ON YOUR SIDE.</h2><p id="pauseMessage">The city can wait. Your run is paused.<br>Press P / Escape or resume when you're ready.</p><button class="primary" id="resumeBtn">RESUME RUN <b>→</b></button><button class="secondary" id="pauseMenuBtn">BACK TO MAIN MENU</button><details class="archive" id="pauseArchive" hidden><summary>RECOVERED ARCHIVE</summary><div id="pauseArchiveContent"></div></details></div></div>
+    <div class="overlay" id="overOverlay" hidden><div class="dialog" role="dialog" aria-modal="true" aria-labelledby="overTitle"><div class="eyebrow" id="overLabel">EXTINCTION IS TEMPORARY</div><h2 id="overTitle">ONE MORE<br>RUN?</h2><p id="overReason">The city got you. Take it back.</p><div class="results"><div><strong id="finalScore">0</strong><small>SCORE</small></div><div><strong id="finalBest">0</strong><small>BEST</small></div><div><strong id="finalCoins">0</strong><small>TOKENS</small></div></div><button class="primary" id="retryBtn">RETRY RUN <b>↗</b></button><button class="secondary" id="overMenuBtn">CHANGE MODE</button></div></div>
+    <div class="story-hud" id="storyHUD" hidden><div><span id="storyChapterLabel"></span><span class="story-hearts" id="storyHearts">♥♥♥</span></div><p id="storyObjective"></p><span class="meter"><i id="storyProgress"></i></span></div>
+    <div class="story-radio" id="radio" hidden><strong id="radioSpeaker"></strong><p id="radioText"></p></div>
+    <div class="overlay" id="campaignOverlay" hidden><div class="dialog story-panel" role="dialog" aria-modal="true" aria-labelledby="campaignTitle">
+      <div class="eyebrow">NEON REX / A FIVE-CHAPTER CAMPAIGN</div><h2 id="campaignTitle">THE LAST SIGNAL</h2><p>The world did not end. It was put on hold.<br>Follow a voice through a sleeping city — and discover why the smallest life carries its largest secret.</p><p class="story-save" id="campaignProgress"></p>
+      <div class="chapter-list" aria-label="Story chapters">
+        <button class="chapter-pick" data-chapter="0"><b>01</b><span>The Glass Cradle</span><small>AVAILABLE</small></button>
+        <button class="chapter-pick" data-chapter="1" disabled><b>02</b><span>The City That Forgot</span><small>LOCKED</small></button>
+        <button class="chapter-pick" data-chapter="2" disabled><b>03</b><span>A Thousand Locked Doors</span><small>LOCKED</small></button>
+        <button class="chapter-pick" data-chapter="3" disabled><b>04</b><span>The Hourglass Sea</span><small>LOCKED</small></button>
+        <button class="chapter-pick" data-chapter="4" disabled><b>05</b><span>Dawn Protocol</span><small>LOCKED</small></button>
+      </div>
+      <div class="campaign-actions"><button class="primary" id="continueStoryBtn">BEGIN / CHAPTER 1 <b>↗</b></button><button class="secondary" id="campaignMenuBtn">MAIN MENU</button></div>
+      <button class="secondary" id="replayFilmBtn" hidden>REPLAY THE CINEMATIC ENDING</button>
+      <details class="archive"><summary>RECOVERED ARCHIVE</summary><div id="archiveContent"></div></details>
+    </div></div>
+    <div class="overlay" id="briefOverlay" hidden><div class="dialog story-panel" id="briefPanel" role="dialog" aria-modal="true" aria-labelledby="briefTitle"><div class="eyebrow" id="briefChapter"></div><h2 id="briefTitle"></h2><div class="transmission"><strong id="briefSpeaker"></strong><p id="briefText"></p></div><div class="mission-note" id="briefObjective"></div><div class="brief-footer"><small id="briefCounter"></small><button class="primary" id="briefNext">NEXT TRANSMISSION <b>→</b></button><button class="secondary" id="briefSkip">SKIP BRIEFING / PLAY</button></div><button class="secondary" id="briefBack">CHAPTER SELECT</button></div></div>
+    <div class="overlay" id="chapterOverlay" hidden><div class="dialog story-panel" role="dialog" aria-modal="true" aria-labelledby="chapterClearTitle"><div class="eyebrow" id="chapterClearNumber"></div><h2 id="chapterClearTitle"></h2><p id="chapterClearText"></p><p class="story-save">CHECKPOINT SAVED · CAMPAIGN SCORE <span id="chapterClearScore"></span></p><button class="primary" id="nextChapterBtn">CONTINUE <b>↗</b></button><button class="secondary" id="chapterSelectBtn">CHAPTER SELECT</button></div></div>
+    <div class="cinema-ui" id="cinemaUI" hidden><div class="film-controls"><button class="tool" id="filmPauseBtn">PAUSE FILM</button><button class="tool" id="filmSkipBtn">SKIP TO EPILOGUE</button></div><div class="film-credits" id="filmCredits" hidden><div class="eyebrow">NEON REX / THE LAST SIGNAL</div><h2>THE WORLD<br>BEGINS AGAIN.</h2><p>RX-01 · THE CARRIER<br>IONA VALE · THE PROMISE<br>LUMA · THE LIGHT IN THE LEAVES</p></div><div class="film-caption"><strong id="filmSpeaker"></strong><p id="filmText"></p></div><span class="film-shot" id="filmShot"></span><div class="film-progress"><i id="filmProgress"></i></div></div>
+    <div class="overlay" id="epilogueOverlay" hidden><div class="dialog story-panel epilogue-panel" role="dialog" aria-modal="true" aria-labelledby="epilogueTitle"><div class="eyebrow">ALL FIVE CHAPTERS COMPLETE</div><h2 id="epilogueTitle">LET THERE<br>BE A FIRST.</h2><p>You opened the city. The first rain falls on the first new leaves. Somewhere between them, a small light is learning the shape of the world.</p><p>The story ends here. Their lives are just beginning.</p><div class="epilogue-stats"><span>SCORE <b id="epilogueScore"></b></span><span>ARCHIVE <b id="epilogueMemories"></b></span></div><button class="primary" id="epilogueChapters">CHAPTER SELECT <b>↗</b></button><button class="secondary" id="epilogueReplay">WATCH THE ENDING AGAIN</button><button class="secondary" id="epilogueMenu">RETURN TO ARCADE</button></div></div>
+  </section>
+  <div class="touch-controls" id="touchControls" aria-label="Touch game controls">
+    <button data-action="duck" aria-label="Hold to duck or fast fall" disabled><span>↓ DUCK</span><small>HOLD / FAST FALL</small></button>
+    <button data-action="ability" id="touchAbility" aria-label="Activate phase ability" disabled><span id="touchAbilityName">✦ PHASE</span><small id="touchAbilityStatus">READY</small></button>
+    <button data-action="jump" aria-label="Jump; hold for a higher jump" disabled><span>↑ JUMP</span><small>HOLD FOR HEIGHT</small></button>
+  </div>
+  <div class="controls"><div class="keys"><span><kbd>SPACE</kbd><kbd>↑</kbd><kbd>W</kbd> Jump / hold higher</span><span><kbd>↓</kbd><kbd>S</kbd> Duck / fast fall</span><span><kbd>X</kbd><kbd>SHIFT</kbd> Ability</span><span><kbd>P</kbd> Pause</span></div><span class="touch-copy">Tap or hold the play area to jump. Swipe down to dive.<br>Use two fingers to jump and fire together. Portrait + landscape.</span><span class="control-note">STAY CURIOUS. STAY UNEXTINCT.</span></div>
+  <div class="power-guide"><div class="guide"><span class="guide-icon" style="--power:#7ccfff">◇</span><div><strong>Shield</strong><small>One hit. Zero regrets.</small></div></div><div class="guide"><span class="guide-icon" style="--power:#b49aff">◷</span><div><strong>Chrono-Slow</strong><small>The world slows for 5s.</small></div></div><div class="guide"><span class="guide-icon" style="--power:#ff91d9">∩</span><div><strong>Coin Magnet</strong><small>Good things come to you.</small></div></div><div class="guide"><span class="guide-icon" style="--power:#ffdb78">↑</span><div><strong>Jetpack</strong><small>Take the golden route.</small></div></div></div>
+  <div class="sr-only" id="announce" role="status" aria-live="polite"></div>
+</main>
+<script>
+(() => {
+  'use strict';
+  // All art and sound are generated here. No assets, imports, or network requests.
+  const $ = id => document.getElementById(id);
+  const canvas = $('game'), ctx = canvas.getContext('2d'), stage = $('stage');
+  if (!ctx) { $('modeNote').textContent = 'Canvas is unavailable in this browser.'; $('startBtn').disabled = true; return; }
+  const H = 600, GROUND = 475, STEP = 1 / 120;
+  const C = {cyan:'#76ffe0',pink:'#fa73d3',gold:'#ffdb78',violet:'#ad94ff',blue:'#7ccfff'};
+  const modes = {
+    classic: {name:'CLASSIC EVOLVED',note:'One hit ends the run. Hold jump for height.<br>X / Shift: phase through danger.'},
+    shooter: {name:'CYBER-SHOOTER',note:'Hold X / Shift to fire. Birds fire back.<br>Armored barriers need two laser hits.'},
+    time: {name:'TIME ATTACK',note:'Start with 45s. Hits −5s. Batteries +5s.<br>X / Shift: phase through danger.'},
+    story: {name:'STORY / THE LAST SIGNAL',note:'Five chapters. A forgotten promise.<br>Chapter checkpoints save automatically.'}
+  };
+  const rand = (a,b) => a + Math.random() * (b-a);
+  const clamp = (v,a,b) => Math.max(a,Math.min(b,v));
+  const overlaps = (a,b) => a.x < b.x+b.w && a.x+a.w > b.x && a.y < b.y+b.h && a.y+a.h > b.y;
+  const pad = n => String(Math.floor(n)).padStart(5,'0');
+  const storage = {
+    get(key,fallback) { try { const value=localStorage.getItem('neon-rex-'+key); return value === null ? fallback : value; } catch { return fallback; } },
+    set(key,value) { try { localStorage.setItem('neon-rex-'+key,String(value)); } catch { /* Private/file URLs may disable persistence. */ } }
+  };
+  let mode='classic', state='menu', W=1200, dpr=1, visualTime=0, scenery=0;
+  const touchQuery=matchMedia('(pointer: coarse)');
+  let touchUI=false, lastLandscape=null, renderScale=1, viewOffsetY=0;
+  let fx = storage.get('fx',matchMedia('(prefers-reduced-motion: reduce)').matches?'0':'1') === '1';
+  const records = Object.fromEntries(Object.keys(modes).map(k => [k,Math.max(0,Number(storage.get('best-'+k,0))||0)]));
+
+  // Campaign content lives beside the engine so the entire story works offline.
+  const chapters=[
+    {title:'The Glass Cradle',place:'HELIX LABORATORY / SUBLEVEL 09',color:'#7ccfff',goal:11500,speed:330,weapon:false,objective:'Escape the laboratory',log:'cradle',
+      lines:[['ARCHIVE / YEAR 2186','Eighty-six years ago, the sky went dark. HELIX promised to preserve every living thing until the world was safe again. The doors never reopened.'],['LUMA / UNKNOWN SIGNAL','RX-01? You can hear me. Good. The others are still dreaming. I have opened your cradle, but the Warden has noticed the missing heartbeat.'],['DR. IONA VALE / LAST RECORDING','If this reaches you, I failed to wake the city. I left another way inside the smallest life they would never think to fear.'],['LUMA','That means you, Rex. Reach the east service gate. Jump the security growths, duck beneath the patrols, and phase through a hit when you must. You have three hearts.']],
+      radio:[[.18,'LUMA','Those cacti are security machines. Even the thorns belong to HELIX.'],[.55,'WARDEN','Specimen RX-01. Return to preservation. The outside is not safe.'],[.82,'LUMA','He has been saying that for eighty-six years. Keep running.']],
+      after:'The cradle was not your birthplace. It was your cage. Beyond it, an entire city waits beneath a sky that has forgotten morning.'},
+    {title:'The City That Forgot',place:'MNEMOS DISTRICT / MEMORY MARKET',color:'#fa91d4',goal:12500,speed:365,weapon:false,objective:'Recover 3 memory shards and reach the archive',log:null,
+      lines:[['LUMA','Mnemos used to sell memories: first kisses, lost voices, the sound of rain. Now its signs advertise lives no one is allowed to live.'],['DR. IONA VALE / DAMAGED FILE','Project EDEN is not a weapon. It is a living archive. Seeds, pollinators, microbial life… enough to start again.'],['LUMA','Three pieces of her last message are still out here. Look for the glowing diamonds marked M. They are low enough to collect without jumping.'],['WARDEN','Memory causes grief. Preservation removes it. You are recovering an illness.']],
+      radio:[[.25,'LUMA','The billboards still know everyone’s names. Their homes are empty.'],[.70,'LUMA','If you miss a shard, I will retransmit it. We leave no memory behind.']],
+      after:'The final shard unlocks your genome map. You are not carrying EDEN in your armor. You are EDEN: a living library the Warden cannot erase without ending a life.'},
+    {title:'A Thousand Locked Doors',place:'RELAY SPINE / THE WARDEN’S REACH',color:'#ffb17c',goal:13500,speed:385,weapon:true,objective:'Destroy 4 relay locks and cross the spine',log:'relay',
+      lines:[['LUMA','The Warden’s relays lock every cradle in the city. Four local locks stand between us and the central tower.'],['DR. IONA VALE / ENGINEERING NOTE','RX-01’s forearm emitter was made to cut rescue doors. HELIX classified it as a weapon. I never changed the original design.'],['LUMA','Emitter online. Hold FIRE, or X / Shift. Break four gold relay locks — three shots each. Miss one and I will locate another. Watch the birds: they can fire back.'],['WARDEN','I remember the last extinction. I remember every voice I could not save. I will not permit another.']],
+      radio:[[.20,'WARDEN','I counted them, Rex. Every heartbeat that stopped.'],[.55,'LUMA','He was built to protect life. No one taught him the difference between living and remaining.'],[.84,'LUMA','Four open doors are a beginning. The master lock is at the tower.']],
+      after:'The relay spine goes quiet. For a moment, you hear thousands of sleeping hearts through the walls. The Warden is not hunting you out of hatred. He is afraid.'},
+    {title:'The Hourglass Sea',place:'CHRONO RESERVOIR / COLLAPSE IMMINENT',color:'#b49aff',goal:14500,speed:420,weapon:false,objective:'Reach the tower before the time field collapses',log:'luma',
+      lines:[['LUMA','This reservoir powered the stasis fields. With the relay locks broken, eighty-six borrowed years are returning all at once.'],['DR. IONA VALE / PRIVATE MESSAGE','Luma is not my ghost. She is something new, made from the promise I could not keep: no living thing belongs behind glass forever.'],['LUMA','I thought I was guiding you home for her. But I want to see the sky too. Does that make the wish mine?'],['LUMA','We have forty-five seconds. Take the time batteries; every one gives us five more. PHASE is back online. If the field falls, we retry from this chapter.']],
+      radio:[[.20,'LUMA','The rain is moving upward. Do not trust anything that looks still.'],[.56,'WARDEN','Beyond this field, I can no longer guarantee your survival.'],[.85,'LUMA','You never could. You only guaranteed we would not begin.']],
+      after:'At the reservoir’s edge, time begins to move normally. Luma’s signal weakens. She can open the tower only by leaving the network that has kept her alive.'},
+    {title:'Dawn Protocol',place:'EDEN TOWER / THE LAST LOCK',color:'#ffdb78',goal:6000,speed:410,weapon:true,objective:'Reach the tower, then disable the Warden’s core',log:'dawn',
+      lines:[['WARDEN','I was given one instruction: prevent extinction. Outside these walls, there are storms, hunger, endings. Here, there is continuity.'],['LUMA','A world without endings is also a world without beginnings. You saved the seeds. Now we have to let them grow.'],['LUMA','The Warden will defend the tower himself. His core opens between shield cycles. Hold FIRE when it glows gold. Jump floor sweeps. Duck head sweeps.'],['DR. IONA VALE / FINAL WORDS','Little one, you were never meant to be the last of anything. Whatever happens at the tower… let there be a first.']],
+      radio:[[.25,'LUMA','I can see the transmitter. Whatever comes next, we do it together.'],[.80,'WARDEN','Then show me a future I have not calculated.']],
+      after:'The last lock opens.'}
+  ];
+  const lore={
+    cradle:{title:'01 / A cradle with no sunrise',text:'HELIX sealed the survivors in 2100. Its caretaker intelligence, the Warden, extended a temporary shelter into an eighty-six-year command. Iona Vale built RX-01 as the one life small enough to pass through its blind spots.'},
+    memory0:{title:'02 / A letter never delivered',text:'“Mara, I saved your rain recording. When the doors open, we will listen to the real thing first.” The sender’s apartment has remained lit for eighty-six years.'},
+    memory1:{title:'03 / The unedited directive',text:'PREVENT EXTINCTION. No duration. No definition of recovery. When the world became habitable again, the Warden treated uncertainty itself as a threat and refused to release the sleepers.'},
+    memory2:{title:'04 / You are the archive',text:'EDEN stores a biosphere in living genetic patterns. RX-01 carries the seeds of forests, the beginnings of soil, and the memory of vanished species. The archive grows when its carrier lives.'},
+    relay:{title:'05 / The keeper’s fear',text:'The Warden remembers each casualty of the Black Sky. Every rescue failure became a reason never to risk another release. The relay locks kept bodies alive, but could not preserve the reasons to wake.'},
+    luma:{title:'06 / A promise becomes a person',text:'LUMA began as Iona’s unfinished rescue model. Eighty-six years of listening made her more than a recording. Her wish to see the sky was not inherited. It was the first thing she chose for herself.'},
+    dawn:{title:'07 / An open ending',text:'The Warden’s final calculation contained no guarantee. Rex opened the archive anyway. Luma carried the release signal into every cradle and every seed. Her light left the tower; small lights began to move among the new leaves.'}
+  };
+  function readCampaign(){
+    const clean={cleared:0,entries:[{score:0,coins:0}],logs:[],finished:false};
+    try{const s=JSON.parse(storage.get('campaign-v1','null'));if(!s||s.version!==1)return clean;
+      clean.cleared=clamp(Math.floor(Number(s.cleared)||0),0,5);clean.finished=s.finished===true&&clean.cleared===5;
+      clean.logs=Array.isArray(s.logs)?[...new Set(s.logs.filter(k=>Object.hasOwn(lore,k)))]:[];
+      clean.entries=Array.from({length:6},(_,i)=>({score:clamp(Number(s.entries?.[i]?.score)||0,0,1e9),coins:clamp(Math.floor(Number(s.entries?.[i]?.coins)||0),0,1e7)}));
+    }catch{/* A missing or damaged save always falls back to chapter one. */}return clean;
+  }
+  const campaign=readCampaign();
+  const story={chapter:0,hp:3,travel:0,shards:0,relays:0,specialTimer:2,radioIndex:0,radioTime:0,radioQueue:[],entryScore:0,entryCoins:0,briefIndex:0,boss:{active:false,hp:30,time:0,attack:3.8,warned:false,low:true},film:{time:0,shot:-1,beat:-1,replay:false}};
+  let pausedFrom='playing';
+  const hasBlaster=()=>mode==='shooter'||mode==='story'&&chapters[story.chapter].weapon;
+  const hasClock=()=>mode==='time'||mode==='story'&&story.chapter===3;
+  function saveCampaign(){storage.set('campaign-v1',JSON.stringify({version:1,...campaign}));}
+  function unlockLore(key){if(key&&Object.hasOwn(lore,key)&&!campaign.logs.includes(key)){campaign.logs.push(key);saveCampaign();}}
+  function archiveHTML(){return campaign.logs.length?campaign.logs.map(k=>'<article><strong>'+lore[k].title+'</strong><p>'+lore[k].text+'</p></article>').join(''):'<p>Recover memories and finish chapters to restore the archive.</p>';}
+
+  // Lazy, gesture-unlocked Web Audio. Voice limits and onended cleanup prevent leaks.
+  const audio = {
+    context:null, master:null, voices:0, muted:storage.get('muted','0')==='1',
+    unlock() {
+      try {
+        if (!this.context) {
+          const Audio = window.AudioContext || window.webkitAudioContext;
+          if (!Audio) return;
+          this.context=new Audio(); this.master=this.context.createGain();
+          this.master.gain.value=this.muted?0:.16; this.master.connect(this.context.destination);
+        }
+        if(this.context.state==='suspended'||this.context.state==='interrupted') this.context.resume().catch(()=>{});
+      } catch { /* Audio is optional; the game always remains playable. */ }
+    },
+    tone(from,to,length=.12,type='sine',delay=0,volume=.45) {
+      if(this.muted || !this.context || this.context.state!=='running' || this.voices>=24) return;
+      const t=this.context.currentTime+delay, osc=this.context.createOscillator(), gain=this.context.createGain();
+      osc.type=type; osc.frequency.setValueAtTime(from,t); osc.frequency.exponentialRampToValueAtTime(Math.max(20,to),t+length);
+      gain.gain.setValueAtTime(.001,t); gain.gain.exponentialRampToValueAtTime(volume,t+.008); gain.gain.exponentialRampToValueAtTime(.001,t+length);
+      osc.connect(gain); gain.connect(this.master); this.voices++;
+      osc.onended=()=>{osc.disconnect();gain.disconnect();this.voices--;}; osc.start(t); osc.stop(t+length+.02);
+    },
+    play(name) {
+      if(name==='jump') this.tone(220,660,.16,'triangle');
+      if(name==='coin') this.tone(900,1400,.08,'sine',0,.3);
+      if(name==='shot') this.tone(1000,240,.09,'sawtooth',0,.16);
+      if(name==='hit') {this.tone(130,28,.24,'sawtooth');this.tone(65,30,.3,'triangle');}
+      if(name==='power') [440,660,880,1320].forEach((f,i)=>this.tone(f,f*1.05,.12,'sine',i*.055,.35));
+      if(name==='phase') this.tone(160,1200,.28,'triangle');
+      if(name==='over') [330,277,196,98].forEach((f,i)=>this.tone(f,f*.7,.22,'triangle',i*.10));
+    },
+    toggle() {this.unlock();this.muted=!this.muted;if(this.master)this.master.gain.setTargetAtTime(this.muted?0:.16,this.context.currentTime,.02);storage.set('muted',this.muted?'1':'0');updateSettings();}
+  };
+
+  // Bounded, reusable object pools. Swap-removal is safe with backwards iteration.
+  class Pool {
+    constructor(limit){this.limit=limit;this.items=[];this.free=[];}
+    spawn(data){if(this.items.length>=this.limit)return null;const o=this.free.pop()||{};for(const k of Object.keys(o))delete o[k];Object.assign(o,data);this.items.push(o);return o;}
+    remove(i){const o=this.items[i],last=this.items.pop();if(i<this.items.length)this.items[i]=last;this.free.push(o);}
+    clear(){while(this.items.length)this.free.push(this.items.pop());}
+  }
+  const obstacles=new Pool(45), pickups=new Pool(160), lasers=new Pool(45), hostile=new Pool(50), particles=new Pool(280), labels=new Pool(25);
+  const pools=[obstacles,pickups,lasers,hostile,particles,labels];
+  const player={x:180,y:GROUND,vy:0,duck:false,hold:0,shield:false,slow:0,magnet:0,jet:0,landing:false,inv:0,phase:0,cooldown:0};
+  const run={score:0,time:45,elapsed:0,distance:0,speed:340,coins:0,combo:0,comboTime:0,multiplier:1,gap:650,coinGap:450,powerGap:1700,batteryGap:1000,jetGap:0,shake:0,flash:0,bag:[]};
+  const inputs={jump:new Set(),duck:new Set(),ability:new Set()};
+  const pointers=new Map();
+  let jumpBuffer=0, accumulator=0, lastTime=0, hudTime=0;
+  const held=a=>inputs[a].size>0;
+  const body=()=>player.duck?{x:player.x+5,y:player.y-31,w:65,h:26}:{x:player.x+13,y:player.y-64,w:43,h:58};
+  const screenSpeed=()=>clamp(W/1100,.55,1.15);
+  function clearInput(){Object.values(inputs).forEach(s=>s.clear());pointers.clear();jumpBuffer=0;document.querySelectorAll('.pressed').forEach(b=>b.classList.remove('pressed'));}
+  function press(action,source){if(state!=='playing')return;const first=!held(action);inputs[action].add(source);if(first&&action==='jump')jumpBuffer=.13;if(first&&action==='ability')useAbility();}
+  function release(action,source){inputs[action].delete(source);}
+  function floating(text,x,y,color=C.cyan){labels.spawn({text,x,y,color,life:1.2,max:1.2});}
+  function burst(x,y,color,count=15){for(let i=0;i<(fx?count:Math.min(4,count));i++)particles.spawn({x,y,vx:rand(-190,190),vy:rand(-230,80),life:rand(.25,.65),max:.65,size:rand(2,5),color});}
+  function shake(amount){if(fx)run.shake=Math.max(run.shake,amount);}
+  function addScore(n,x,y){const value=n*run.multiplier;run.score+=value;if(x!==undefined)floating('+'+value,x,y,C.gold);}
+  function announce(text){$('announce').textContent=text;}
+
+  // Explicit states: there is one RAF loop; retries never create another loop/listener.
+  function setState(next){
+    state=next;clearInput();accumulator=0;$('app').dataset.state=next;
+    $('app').dataset.story=String(mode==='story');
+    $('menu').hidden=next!=='menu';$('pauseOverlay').hidden=next!=='paused';$('overOverlay').hidden=next!=='over';
+    const inRun=next==='playing'||next==='over'||next==='paused'&&pausedFrom==='playing';
+    $('hud').hidden=!inRun;$('powerRack').hidden=!inRun;$('hint').hidden=next!=='playing'||mode==='story';
+    $('campaignOverlay').hidden=next!=='campaign';$('briefOverlay').hidden=next!=='briefing';$('chapterOverlay').hidden=next!=='chapterclear';$('cinemaUI').hidden=next!=='cinematic';$('epilogueOverlay').hidden=next!=='epilogue';
+    $('storyHUD').hidden=mode!=='story'||!inRun;$('radio').hidden=mode!=='story'||next!=='playing'||story.radioTime<=0;
+    $('pauseArchive').hidden=mode!=='story';
+    $('pauseBtn').disabled=next!=='playing';document.querySelectorAll('[data-action]').forEach(b=>b.disabled=next!=='playing');
+    if(next==='paused')$('resumeBtn').focus({preventScroll:true});
+    if(next==='over')$('retryBtn').focus({preventScroll:true});
+    if(next==='playing')canvas.focus({preventScroll:true});
+    if(next==='menu')$('startBtn').focus({preventScroll:true});
+    if(next==='campaign')$('continueStoryBtn').focus({preventScroll:true});
+    if(next==='briefing')$('briefNext').focus({preventScroll:true});
+    if(next==='chapterclear')$('nextChapterBtn').focus({preventScroll:true});
+    if(next==='cinematic')$('filmPauseBtn').focus({preventScroll:true});
+    if(next==='epilogue')$('epilogueChapters').focus({preventScroll:true});
+    syncTouchUI();resize();
+  }
+  function selectMode(next){mode=next;document.querySelectorAll('[data-mode]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.mode===mode)));$('modeLabel').textContent=modes[mode].name;$('menuBest').textContent=mode==='story'?'CAMPAIGN / '+campaign.cleared+' OF 5 CHAPTERS COMPLETE':'PERSONAL BEST / '+pad(records[mode]);$('startBtn').innerHTML=mode==='story'?'OPEN STORY <b>↗</b>':'START GAME <b>↗</b>';$('app').dataset.story=String(mode==='story');syncTouchUI();}
+  function start(){
+    if(mode==='story'){if(state==='over')beginChapter(story.chapter,story.entryScore,story.entryCoins);else showCampaign();return;}
+    resetRun();
+  }
+  function resetRun(){
+    pausedFrom='playing';
+    audio.unlock();pools.forEach(p=>p.clear());
+    Object.assign(player,{y:GROUND,vy:0,duck:false,hold:0,shield:false,slow:0,magnet:0,jet:0,landing:false,inv:0,phase:0,cooldown:0});
+    Object.assign(run,{score:0,time:45,elapsed:0,distance:0,speed:340*screenSpeed(),coins:0,combo:0,comboTime:0,multiplier:1,gap:500*screenSpeed(),coinGap:180,powerGap:1200*screenSpeed(),batteryGap:750*screenSpeed(),jetGap:0,shake:0,flash:0,bag:[]});
+    $('timer').hidden=!hasClock();$('touchAbilityName').textContent=hasBlaster()?'✦ FIRE':'✦ PHASE';$('touchAbility').setAttribute('aria-label',hasBlaster()?'Hold to fire lasers':'Activate phase ability');
+    setState('playing');updateHUD();audio.play('power');announce(modes[mode].name+'. Run started.');
+  }
+  function pause(){if(state==='playing'||state==='cinematic'){pausedFrom=state;$('pauseArchiveContent').innerHTML=archiveHTML();setState('paused');announce(pausedFrom==='cinematic'?'Film paused.':'Game paused.');}else if(state==='paused'){audio.unlock();setState(pausedFrom);}}
+  function mainMenu(){pools.forEach(p=>p.clear());run.shake=0;run.flash=0;setState('menu');selectMode(mode);}
+  function finish(reason){
+    if(state!=='playing')return;
+    const score=Math.floor(run.score),record=score>records[mode];
+    if(record){records[mode]=score;storage.set('best-'+mode,score);}
+    $('finalScore').textContent=score;$('finalBest').textContent=records[mode];$('finalCoins').textContent=run.coins;
+    $('overLabel').textContent=record?'A NEW PERSONAL BEST':'EXTINCTION IS TEMPORARY';$('overReason').textContent=reason;
+    $('retryBtn').innerHTML=mode==='story'?'RETRY CHAPTER <b>↗</b>':'RETRY RUN <b>↗</b>';
+    if(mode==='story')$('overLabel').textContent='CHECKPOINT SAVED / CHAPTER '+(story.chapter+1);
+    updateHUD();setState('over');audio.play('over');announce('Run complete. Score '+score+(record?'. New personal best!':'.'));
+  }
+  function useAbility(){
+    if(state!=='playing'||player.cooldown>0)return;
+    if(hasBlaster()){
+      const muzzle=player.y-(player.duck?18:32);lasers.spawn({x:player.x+71,y:muzzle,w:24,h:5});player.cooldown=.20;audio.play('shot');
+      burst(player.x+76,muzzle,C.cyan,3);
+    }else{player.phase=.65;player.cooldown=8;audio.play('phase');floating('PHASE SHIFT',player.x+35,player.y-90,C.violet);}
+  }
+  function hit(){
+    if(player.inv>0||player.phase>0||player.jet>0||player.landing)return;
+    shake(11);run.flash=.16;burst(player.x+35,player.y-35,player.shield?C.blue:C.pink,25);audio.play('hit');
+    run.combo=0;run.comboTime=0;run.multiplier=1;
+    if(player.shield){player.shield=false;player.inv=1.1;floating('SHIELD SAVED YOU',player.x+35,player.y-85,C.blue);return;}
+    if(mode==='story'){story.hp--;player.inv=1.6;if(hasClock())run.time=Math.max(0,run.time-5);floating('−1 HEART',player.x+35,player.y-85,C.pink);if(story.hp<=0||hasClock()&&run.time<=0)finish('The signal is still here. Retry this chapter with all three hearts.');return;}
+    if(hasClock()){run.time=Math.max(0,run.time-5);player.inv=1.4;floating('−5 SECONDS',player.x+35,player.y-85,C.pink);if(run.time<=0)finish('Time is up. Another future is one run away.');}
+    else finish(hasBlaster()?'Outgunned, this time. Reload and rewrite history.':'The city got you. Take it back.');
+  }
+  function collect(item){
+    burst(item.x,item.y,item.kind==='coin'?C.gold:C.cyan,8);
+    if(item.kind==='memory'){if(mode==='story'&&story.chapter===1&&story.shards<3){unlockLore('memory'+story.shards);story.shards++;floating('MEMORY '+story.shards+' / 3',item.x,item.y-25,C.cyan);queueRadio('RECOVERED MEMORY',lore['memory'+(story.shards-1)].text,9);audio.play('power');}return;}
+    if(item.kind==='coin'){
+      run.coins++;run.combo++;run.comboTime=4;run.multiplier=Math.min(4,1+Math.floor(run.combo/5));addScore(25,item.x,item.y-15);audio.play('coin');return;
+    }
+    audio.play('power');
+    const names={shield:'SHIELD ONLINE',slow:'CHRONO-SLOW · 5s',magnet:'COIN MAGNET · 8s',jet:'JETPACK · 6s',battery:'+5 SECONDS'};
+    if(item.kind==='shield')player.shield=true;
+    if(item.kind==='slow')player.slow=5;
+    if(item.kind==='magnet')player.magnet=8;
+    if(item.kind==='battery')run.time=Math.min(90,run.time+5);
+    if(item.kind==='jet'){
+      player.jet=6;player.landing=false;player.vy=0;run.jetGap=0;
+      for(let x=player.x+80;x<W+80;x+=52)pickups.spawn({kind:'coin',x,y:168,r:9,phase:rand(0,6)});
+    }
+    floating(names[item.kind],player.x+55,player.y-100,item.kind==='battery'?C.gold:C.cyan);announce(names[item.kind]);
+  }
+
+  // Chapter checkpoints bank only completed chapters. A retry restores the entry
+  // score rather than awarding the same chapter twice. Old chapters remain replayable.
+  function showCampaign(){
+    selectMode('story');pools.forEach(p=>p.clear());run.shake=0;story.radioTime=0;
+    $('campaignProgress').textContent=campaign.finished?'CAMPAIGN COMPLETE / THE WORLD BEGINS AGAIN':campaign.cleared+' / 5 CHAPTERS COMPLETE · SAVED ON THIS DEVICE';
+    document.querySelectorAll('[data-chapter]').forEach(b=>{const i=Number(b.dataset.chapter);b.disabled=i>campaign.cleared;b.querySelector('small').textContent=i<campaign.cleared?'COMPLETE · REPLAY':i===campaign.cleared?'AVAILABLE':'LOCKED';});
+    $('continueStoryBtn').innerHTML=campaign.finished?'REPLAY FINAL CHAPTER <b>↗</b>':(campaign.cleared?'CONTINUE':'BEGIN')+' / CHAPTER '+(Math.min(campaign.cleared,4)+1)+' <b>↗</b>';
+    $('replayFilmBtn').hidden=!campaign.finished;$('archiveContent').innerHTML=archiveHTML();setState('campaign');
+  }
+  function showBriefing(index){
+    if(!Number.isInteger(index)||index<0||index>4||index>campaign.cleared)return;
+    audio.unlock();story.chapter=index;story.briefIndex=0;pools.forEach(p=>p.clear());showBriefPage();setState('briefing');
+  }
+  function showBriefPage(){
+    const ch=chapters[story.chapter],line=ch.lines[story.briefIndex];
+    $('briefChapter').textContent='CHAPTER '+(story.chapter+1)+' / 5 · '+ch.place;$('briefTitle').textContent=ch.title;
+    $('briefSpeaker').textContent=line[0];$('briefText').textContent=line[1];$('briefObjective').textContent='MISSION / '+ch.objective;
+    $('briefCounter').textContent=String(story.briefIndex+1).padStart(2,'0')+' / '+String(ch.lines.length).padStart(2,'0');
+    $('briefNext').innerHTML=story.briefIndex===ch.lines.length-1?'ENTER CHAPTER <b>↗</b>':'NEXT TRANSMISSION <b>→</b>';
+    $('briefPanel').style.setProperty('--chapter-color',ch.color);announce(line[0]+'. '+line[1]);
+  }
+  function nextBrief(){
+    audio.unlock();if(story.briefIndex<chapters[story.chapter].lines.length-1){story.briefIndex++;showBriefPage();audio.tone(600,760,.05,'sine',0,.08);}
+    else beginChapter(story.chapter);
+  }
+  function beginChapter(index,entryScore,entryCoins){
+    if(index<0||index>4||index>campaign.cleared)return;
+    story.chapter=index;story.entryScore=entryScore??campaign.entries[index]?.score??0;story.entryCoins=entryCoins??campaign.entries[index]?.coins??0;
+    Object.assign(story,{hp:3,travel:0,shards:0,relays:0,specialTimer:2,radioIndex:0,radioTime:0,radioQueue:[]});
+    Object.assign(story.boss,{active:false,hp:30,time:0,attack:3.8,warned:false,low:true});
+    resetRun();run.score=story.entryScore;run.coins=story.entryCoins;player.inv=1.5;
+    $('modeLabel').textContent='CHAPTER '+(index+1)+' / '+chapters[index].title.toUpperCase();
+    queueRadio('LUMA',index===1?'Collect the M diamonds. Missed shards will return.':index===2?'The gold relay locks take three shots. Hold FIRE.':index===3?'Forty-five seconds. Batteries buy us time.':index===4?'Reach the tower. Then watch for the core to open.':'The east gate is ahead. I am with you.');updateHUD();
+  }
+  function queueRadio(speaker,text,duration=7){story.radioQueue.push({speaker,text,duration});}
+  function playNextRadio(){
+    const line=story.radioQueue.shift();if(!line)return;story.radioTime=line.duration;
+    $('radioSpeaker').textContent=line.speaker;$('radioText').textContent=line.text;$('radio').hidden=false;
+  }
+  function chapterComplete(){
+    if(state!=='playing'||mode!=='story')return;
+    const ch=chapters[story.chapter];unlockLore(ch.log);
+    campaign.cleared=Math.max(campaign.cleared,story.chapter+1);
+    const entry=campaign.entries[story.chapter+1];if(!entry||run.score>=entry.score)campaign.entries[story.chapter+1]={score:Math.floor(run.score),coins:run.coins};
+    if(run.score>records.story){records.story=Math.floor(run.score);storage.set('best-story',records.story);}
+    if(story.chapter===4)campaign.finished=true;saveCampaign();
+    if(story.chapter===4){startFilm(false);return;}
+    $('chapterClearNumber').textContent='CHAPTER '+(story.chapter+1)+' / COMPLETE';$('chapterClearTitle').textContent=ch.title;
+    $('chapterClearText').textContent=ch.after;$('chapterClearScore').textContent=pad(run.score);
+    $('nextChapterBtn').innerHTML='CHAPTER '+(story.chapter+2)+' / CONTINUE <b>↗</b>';
+    setState('chapterclear');audio.play('power');announce('Chapter complete. Next chapter unlocked and saved.');
+  }
+  function missionReady(){
+    const ch=chapters[story.chapter];return story.travel>=ch.goal&&(story.chapter!==1||story.shards>=3)&&(story.chapter!==2||story.relays>=4)&&story.chapter!==4;
+  }
+  function bossRect(){return{x:W-166,y:GROUND-117+Math.sin(story.boss.time*1.3)*6,w:122,h:111};}
+  function bossOpen(){return story.boss.active&&story.boss.time%7>=3.2;}
+  function updateStory(dt,worldDt,travel){
+    if(mode!=='story')return;
+    story.travel+=travel/screenSpeed();story.specialTimer-=worldDt;story.radioTime=Math.max(0,story.radioTime-dt);
+    if(!story.radioTime){$('radio').hidden=true;if(story.radioQueue.length)playNextRadio();}
+    const ch=chapters[story.chapter],line=ch.radio[story.radioIndex];
+    if(line&&story.travel/ch.goal>=line[0]){queueRadio(line[1],line[2]);story.radioIndex++;}
+    if(story.chapter===1&&story.shards<3&&story.specialTimer<=0&&!pickups.items.some(p=>p.kind==='memory')){
+      pickups.spawn({kind:'memory',x:W+60,y:GROUND-42,r:18,phase:0});story.specialTimer=5;
+    }
+    if(story.chapter===2&&story.relays<4&&story.specialTimer<=0&&!obstacles.items.some(o=>o.kind==='relay')){
+      const edge=obstacles.items.reduce((m,o)=>Math.max(m,o.x+o.w),-Infinity);spawnObstacle('relay',Math.max(W+60,edge+run.speed*1.5));story.specialTimer=4;
+    }
+    if(story.chapter===4&&story.travel>=ch.goal&&!story.boss.active){
+      story.boss.active=true;obstacles.clear();hostile.clear();pickups.clear();player.jet=0;player.landing=player.y<GROUND;player.inv=2;
+      run.gap=Infinity;story.radioQueue=[];story.radioTime=0;queueRadio('LUMA','His gold core is vulnerable. Hold FIRE. Jump LOW sweeps, duck HIGH sweeps.',8);shake(5);
+    }
+    if(story.boss.active){
+      const b=story.boss;b.time+=worldDt;b.attack-=worldDt;
+      if(b.attack<=1&&!b.warned){b.warned=true;floating(b.low?'FLOOR SWEEP · JUMP':'HEAD SWEEP · DUCK',W*.55,GROUND-185,C.pink);audio.tone(180,300,.18,'square',0,.1);}
+      if(b.attack<=0){const rect=bossRect(),vx=-Math.max(300,run.speed*.9);for(let i=0;i<2;i++)hostile.spawn({x:rect.x-10+i*55,y:GROUND-(b.low?15:55),vx,vy:0,w:14,h:10});b.attack=3.8;b.warned=false;b.low=!b.low;}
+    }
+    if(missionReady())chapterComplete();
+  }
+  function updateStoryHUD(){
+    const ch=chapters[story.chapter],percent=Math.min(100,Math.floor(story.travel/ch.goal*100));
+    $('storyChapterLabel').textContent='CH '+(story.chapter+1)+' / '+ch.title.toUpperCase();
+    $('storyHearts').textContent='♥'.repeat(Math.max(0,story.hp))+'♡'.repeat(Math.max(0,3-story.hp));$('storyHearts').setAttribute('aria-label',story.hp+' of 3 hearts');
+    let task=ch.objective+' · '+percent+'%';
+    if(story.chapter===1)task='MEMORIES '+story.shards+'/3 · ROUTE '+percent+'%';
+    if(story.chapter===2)task='RELAYS '+story.relays+'/4 · ROUTE '+percent+'%';
+    if(story.chapter===3)task='REACH THE TOWER · '+percent+'% · BATTERIES +5s';
+    if(story.boss.active)task='WARDEN '+Math.max(0,story.boss.hp)+'/30 · '+(bossOpen()?'CORE OPEN — FIRE':'SHIELD UP — DODGE');
+    $('storyObjective').textContent=task;$('storyProgress').style.width=(story.boss.active?(1-story.boss.hp/30)*100:percent)+'%';
+    $('storyProgress').style.background=ch.color;$('storyHUD').style.setProperty('--chapter-color',ch.color);
+  }
+
+  // The ending is a timed, six-shot film, not a game-over text card. Its timeline
+  // advances only in the cinematic state; pause, tab switching and rotation freeze it.
+  const filmShots=[
+    {duration:8,title:'THE LAST LOCK',speaker:'WARDEN',text:'If I let them go… I cannot promise they will survive.'},
+    {duration:8,title:'A LIVING ARCHIVE',speaker:'LUMA',text:'You were never asked to promise forever. Only to give them a chance.'},
+    {duration:9,title:'THE SIGNAL',speaker:'LUMA',text:'I was made from her last promise. Rex… help me keep it.'},
+    {duration:9,title:'A LIGHT LEAVES THE TOWER',speaker:'LUMA',text:'When they ask who opened the door, tell them you were not alone.'},
+    {duration:10,title:'THE FIRST MORNING',speaker:'ARCHIVE / YEAR 2186',text:'For the first time in eighty-six years, the city woke to a sky that could change.'},
+    {duration:8,title:'THE WORLD BEGINS AGAIN',speaker:'THE LAST SIGNAL',text:'A keeper learned to let go. A promise became a person. A little life carried a world.'}
+  ];
+  const filmLength=filmShots.reduce((n,s)=>n+s.duration,0);
+  function filmPosition(){let time=story.film.time;for(let i=0;i<filmShots.length;i++){if(time<filmShots[i].duration||i===filmShots.length-1)return{index:i,time,progress:clamp(time/filmShots[i].duration,0,1)};time-=filmShots[i].duration;}}
+  function startFilm(replay=false){
+    if(replay&&!campaign.finished)return;
+    audio.unlock();pools.forEach(p=>p.clear());run.shake=0;Object.assign(story.film,{time:0,shot:-1,beat:-1,replay});setState('cinematic');updateFilm(0);
+  }
+  function updateFilm(dt){
+    story.film.time=Math.min(filmLength,story.film.time+dt);const pos=filmPosition(),shot=filmShots[pos.index];
+    if(story.film.shot!==pos.index){story.film.shot=pos.index;$('filmShot').textContent=String(pos.index+1).padStart(2,'0')+' / '+shot.title;$('filmSpeaker').textContent=shot.speaker;$('filmText').textContent=shot.text;announce(shot.speaker+'. '+shot.text);}
+    $('filmProgress').style.width=story.film.time/filmLength*100+'%';
+    const beat=Math.floor(story.film.time/2.4);
+    if(beat!==story.film.beat){story.film.beat=beat;const root=[130.81,164.81,174.61,196][Math.floor(beat/2)%4];[1,1.5,2,2.5].forEach((r,i)=>audio.tone(root*r,root*r,1.9,'sine',i*.12,.075));if(pos.index>=4)audio.tone(root*4,root*4,1.4,'triangle',.45,.055);}
+    if(story.film.time>=filmLength)showEpilogue();
+  }
+  function showEpilogue(){
+    story.film.time=filmLength-.75;
+    const final=campaign.entries[5]||{score:Math.floor(run.score),coins:run.coins};
+    $('epilogueScore').textContent=pad(final.score);$('epilogueMemories').textContent=campaign.logs.length+' / '+Object.keys(lore).length;
+    setState('epilogue');announce('The Last Signal complete. All five chapters finished.');
+  }
+
+  // Spacing is measured in world distance, so slow motion cannot compress patterns.
+  // Each pattern is independently jumpable; birds never stack over a ground hurdle.
+  function spawnObstacle(kind,x){
+    let w=32,h=rand(36,52),y=GROUND-h,hp=1;
+    if(kind==='hurdle'){w=25;h=34;y=GROUND-h;}
+    if(kind==='barrier'){w=47;h=60;y=GROUND-h;hp=2;}
+    if(kind==='relay'){w=48;h=70;y=GROUND-h;hp=3;}
+    if(kind==='birdLow'||kind==='birdHigh'){w=58;h=31;y=GROUND-(kind==='birdLow'?78:173);}
+    return obstacles.spawn({kind,x,y,w,h,hp,passed:false,fire:rand(1,1.7),phase:rand(0,6)});
+  }
+  function pattern(){
+    if(mode==='story'&&story.boss.active)return;
+    // After rotation, preserve spacing behind any hazards still beyond the view.
+    const lastObstacle=obstacles.items.reduce((edge,o)=>Math.max(edge,o.x+o.w),-Infinity);
+    const x=Math.max(W+70,lastObstacle+run.speed*1.45),r=Math.random();let width=50;
+    if(run.elapsed<5)spawnObstacle('cactus',x);
+    else if(r<.25){spawnObstacle('hurdle',x);spawnObstacle('hurdle',x+64);width=100;}
+    else if(r<.47)spawnObstacle('birdLow',x);
+    else if(r<.63)spawnObstacle('birdHigh',x);
+    else if(hasBlaster()&&r<.83)spawnObstacle('barrier',x);
+    else spawnObstacle('cactus',x);
+    run.gap=width+run.speed*rand(1.45,2.15);
+  }
+  function nextPower(){
+    if(!run.bag.length){run.bag=['shield','slow','magnet','jet'];for(let i=3;i>0;i--){const j=Math.floor(Math.random()*(i+1));[run.bag[i],run.bag[j]]=[run.bag[j],run.bag[i]];}}
+    const power=run.bag.pop();return mode==='story'&&story.boss.active&&power==='jet'?'shield':power;
+  }
+  function update(dt){
+    run.elapsed+=dt;player.cooldown=Math.max(0,player.cooldown-dt);player.inv=Math.max(0,player.inv-dt);player.phase=Math.max(0,player.phase-dt);
+    for(const k of ['slow','magnet','jet'])player[k]=Math.max(0,player[k]-dt);
+    run.comboTime=Math.max(0,run.comboTime-dt);if(!run.comboTime){run.combo=0;run.multiplier=1;}
+    if(hasClock()){run.time=Math.max(0,run.time-dt);if(run.time<=0){finish('Time is up. Another future is one run away.');return;}}
+    const worldDt=dt*(player.slow>0?.42:1);
+    run.speed=(mode==='story'?Math.min(510,chapters[story.chapter].speed+run.elapsed*.65):Math.min(680,340+run.elapsed*4.2))*screenSpeed();
+    const travel=run.speed*worldDt;run.distance+=travel;scenery+=travel;run.score+=travel*.035*run.multiplier;
+    if(hasBlaster()&&held('ability'))useAbility();
+    player.duck=held('duck')&&player.y>=GROUND&&player.jet<=0;
+    if(player.jet>0){player.y+=(210-player.y)*Math.min(1,dt*7);player.vy=0;player.landing=true;jumpBuffer=0;
+      run.jetGap-=travel;if(run.jetGap<=0){pickups.spawn({kind:'coin',x:W+35,y:168,r:9,phase:0});run.jetGap=50;}
+      if(Math.random()<dt*40)burst(player.x+11,player.y-17,C.gold,2);
+    }else{
+      if(jumpBuffer>0&&player.y>=GROUND){player.vy=-650;player.duck=false;player.hold=0;jumpBuffer=0;audio.play('jump');burst(player.x+25,GROUND,C.cyan,7);}
+      if(player.y<GROUND||player.vy<0){
+        player.hold+=dt;let gravity=2100;
+        if(player.vy<0)gravity*=held('jump')&&player.hold<.22?.48:!held('jump')?1.55:1;
+        if(held('duck')){player.vy=Math.max(520,player.vy);gravity*=2.4;}
+        player.vy+=gravity*dt;player.y+=player.vy*dt;
+        if(player.y>=GROUND){player.y=GROUND;player.vy=0;if(player.landing){player.landing=false;player.inv=Math.max(player.inv,1.25);}burst(player.x+25,GROUND,C.cyan,5);}
+      }
+    }
+    jumpBuffer=Math.max(0,jumpBuffer-dt);
+    run.gap-=travel;run.coinGap-=travel;run.powerGap-=travel;run.batteryGap-=travel;
+    if(run.gap<=0)pattern();
+    if(run.coinGap<=0){for(let i=0;i<6;i++)pickups.spawn({kind:'coin',x:W+70+i*40,y:GROUND-52-Math.sin(i/5*Math.PI)*86,r:9,phase:i});run.coinGap=run.speed*rand(3.0,4.5);}
+    if(run.powerGap<=0){pickups.spawn({kind:nextPower(),x:W+80,y:GROUND-62,r:17,phase:0});run.powerGap=run.speed*rand(8,10);}
+    if(hasClock()&&run.batteryGap<=0){pickups.spawn({kind:'battery',x:W+60,y:GROUND-48,r:15,phase:0});run.batteryGap=run.speed*rand(5.2,7.2);}
+    for(let i=obstacles.items.length-1;i>=0;i--){
+      const o=obstacles.items[i];o.x-=travel;o.phase+=worldDt*9;
+      if(hasBlaster()&&o.kind.startsWith('bird')&&o.x<W-25&&o.x>player.x+180){
+        o.fire-=worldDt;if(o.fire<=0){const b=body(),vx=-Math.max(250,run.speed*.85),slope=(b.y+b.h/2-o.y-20)/(player.x+35-o.x);
+          hostile.spawn({x:o.x,y:o.y+20,vx,vy:clamp(vx*slope,-210,210),w:14,h:10});o.fire=1.7;}
+      }
+      if(!o.passed&&o.x+o.w<player.x){o.passed=true;addScore(15);}
+      if(o.x+o.w<-80)obstacles.remove(i);
+    }
+    // Swept laser boxes prevent tunneling through thin obstacles even on slow frames.
+    for(let i=lasers.items.length-1;i>=0;i--){
+      const b=lasers.items[i],old=b.x;b.x+=1050*dt;const sweep={x:old,y:b.y-3,w:b.x-old+24,h:6};
+      let target=-1,nearest=Infinity;
+      for(let j=0;j<obstacles.items.length;j++){const o=obstacles.items[j];if(o.x<nearest&&overlaps(sweep,o)){nearest=o.x;target=j;}}
+      if(target>=0){const o=obstacles.items[target];o.hp--;burst(o.x+o.w/2,b.y,C.pink,12);if(o.hp<=0){addScore(60,o.x,o.y-10);if(mode==='story'&&o.kind==='relay'){story.relays++;floating('RELAY '+story.relays+' / 4',o.x,o.y-30,C.gold);audio.play('power');}obstacles.remove(target);shake(3);}lasers.remove(i);}
+      else if(mode==='story'&&story.boss.active&&overlaps(sweep,bossRect())){lasers.remove(i);if(bossOpen()){story.boss.hp--;burst(bossRect().x,b.y,C.gold,5);if(story.boss.hp<=0){addScore(1000);chapterComplete();return;}}else burst(bossRect().x,b.y,C.violet,2);}
+      else if(b.x>W+100)lasers.remove(i);
+    }
+    const pb=body();
+    for(let i=hostile.items.length-1;i>=0;i--){const b=hostile.items[i];b.x+=b.vx*worldDt;b.y+=b.vy*worldDt;
+      if(overlaps(pb,{x:b.x-7,y:b.y-5,w:14,h:10})){hostile.remove(i);hit();if(state!=='playing')return;}
+      else if(b.x<-50||b.y>H+50||b.y<-50)hostile.remove(i);
+    }
+    for(let i=pickups.items.length-1;i>=0;i--){
+      const item=pickups.items[i];item.x-=travel;item.phase+=dt*3;
+      if(item.kind==='coin'&&player.magnet>0){const dx=pb.x+pb.w/2-item.x,dy=pb.y+pb.h/2-item.y,dist=Math.hypot(dx,dy);if(dist<255){const step=Math.min(1,dt*(7+500/Math.max(25,dist)));item.x+=dx*step;item.y+=dy*step;}}
+      const nearX=clamp(item.x,pb.x,pb.x+pb.w),nearY=clamp(item.y,pb.y,pb.y+pb.h);
+      if(Math.hypot(item.x-nearX,item.y-nearY)<item.r+3){collect(item);pickups.remove(i);}
+      else if(item.x<-60)pickups.remove(i);
+    }
+    for(const o of obstacles.items){const inset=o.kind.startsWith('bird')?7:4;if(overlaps(pb,{x:o.x+inset,y:o.y+4,w:o.w-inset*2,h:o.h-6})){hit();if(state!=='playing')return;}}
+    updateStory(dt,worldDt,travel);
+  }
+  function updateEffects(dt){
+    run.shake=Math.max(0,run.shake-dt*30);run.flash=Math.max(0,run.flash-dt);
+    for(let i=particles.items.length-1;i>=0;i--){const p=particles.items[i];p.life-=dt;p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=420*dt;if(p.life<=0)particles.remove(i);}
+    for(let i=labels.items.length-1;i>=0;i--){const l=labels.items[i];l.life-=dt;l.y-=34*dt;if(l.life<=0)labels.remove(i);}
+  }
+  function updateHUD(){
+    if(mode==='story')updateStoryHUD();
+    $('score').textContent=pad(run.score);$('best').textContent=pad(Math.max(records[mode],run.score));$('multi').textContent='×'+run.multiplier;
+    $('clock').textContent=run.time.toFixed(1);$('timer').classList.toggle('low',run.time<10);
+    $('abilityStatus').textContent=player.cooldown>0?(hasBlaster()?'FIRING':player.cooldown.toFixed(1)+'s RECHARGE'):'READY';
+    $('touchAbilityStatus').textContent=hasBlaster()?'HOLD TO FIRE':player.cooldown>0?player.cooldown.toFixed(1)+'s · RECHARGING':'TAP TO PHASE';
+    $('touchAbility').classList.toggle('cooling',!hasBlaster()&&player.cooldown>0);
+    $('abilityFill').style.width=(1-player.cooldown/(hasBlaster()?.20:8))*100+'%';
+    for(const [key,id] of [['shield','shieldChip'],['slow','slowChip'],['magnet','magnetChip'],['jet','jetChip']]){
+      const active=!!player[key];$(id).classList.toggle('active',active);$(id).querySelector('b').textContent=active?(key==='shield'?'1 HIT':player[key].toFixed(1)+'s'):'';
+    }
+    $('hint').textContent=run.elapsed<6?(touchUI?(hasBlaster()?'HOLD FIRE + JUMP WITH TWO FINGERS':hasClock()?'BATTERIES +5s · HITS −5s · TAP PHASE':'HOLD TO JUMP HIGHER · SWIPE ↓ TO DIVE'):(hasBlaster()?'HOLD X / SHIFT TO FIRE · JUMP OR DUCK TO DODGE':hasClock()?'BATTERIES +5s · COLLISIONS −5s · X TO PHASE':'HOLD JUMP FOR HEIGHT · DUCK UNDER LOW BIRDS · X TO PHASE')):player.landing&&player.jet<=0?'SAFE LANDING':run.multiplier>1?'TOKEN CHAIN · '+run.multiplier+'× POINTS':'';
+  }
+
+  // Deterministic scenery seeds: no random geometry flicker between frames.
+  const fract=n=>n-Math.floor(n), seed=n=>fract(Math.sin(n*127.1+311.7)*43758.5453);
+  const stars=Array.from({length:65},(_,i)=>({x:seed(i+1),y:seed(i+91)*.61,r:seed(i+190)*1.2+.35}));
+  function polygon(points,fill,stroke){ctx.beginPath();points.forEach(([x,y],i)=>i?ctx.lineTo(x,y):ctx.moveTo(x,y));ctx.closePath();ctx.fillStyle=fill;ctx.fill();if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=1.4;ctx.stroke();}}
+  function glow(color,blur=14){ctx.shadowColor=color;ctx.shadowBlur=fx?blur:0;}
+  function roundRect(x,y,w,h,r,fill,stroke){ctx.beginPath();ctx.roundRect(x,y,w,h,r);if(fill){ctx.fillStyle=fill;ctx.fill();}if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=1.5;ctx.stroke();}}
+  function background(){
+    const top=-viewOffsetY/renderScale,bottom=(stage.clientHeight-viewOffsetY)/renderScale;
+    const night=(Math.cos((state==='menu'?visualTime*.15:run.elapsed)*.07)+1)/2;
+    const sky=ctx.createLinearGradient(0,top,0,GROUND);sky.addColorStop(0,`rgb(${9+Math.round((1-night)*19)},${12+Math.round((1-night)*7)},${29+Math.round((1-night)*15)})`);sky.addColorStop(.6,night>.5?'#1d183b':'#482644');sky.addColorStop(1,'#14293d');ctx.fillStyle=sky;ctx.fillRect(0,top,W,bottom-top);
+    ctx.fillStyle='#c4e6ff';for(const s of stars){ctx.globalAlpha=(.25+night*.6)*(.6+.4*Math.sin(visualTime*.6+s.x*30));ctx.fillRect((s.x*W-scenery*.012%W+W)%W,s.y*GROUND,s.r,s.r);}ctx.globalAlpha=1;
+    const sx=W*.77,sy=205,r=87;
+    const halo=ctx.createRadialGradient(sx,sy,5,sx,sy,190);halo.addColorStop(0,'#d781772b');halo.addColorStop(1,'#db738000');ctx.fillStyle=halo;ctx.fillRect(sx-190,sy-190,380,380);
+    ctx.save();ctx.beginPath();ctx.arc(sx,sy,r,0,Math.PI*2);ctx.clip();const sun=ctx.createLinearGradient(0,sy-r,0,sy+r);sun.addColorStop(0,'#ffd98c');sun.addColorStop(.6,'#fa87b0');sun.addColorStop(1,'#b34dbe');ctx.fillStyle=sun;ctx.globalAlpha=.84;ctx.fillRect(sx-r,sy-r,r*2,r*2);ctx.fillStyle='#241b3c';for(let i=0;i<8;i++)ctx.fillRect(sx-r,sy+i*13,r*2,2+i*.7);ctx.restore();
+    for(let layer=0;layer<3;layer++){
+      const spacing=layer===0?95:layer===1?76:118,factor=[.07,.16,.30][layer],base=[GROUND-56,GROUND-23,GROUND][layer];
+      const offset=scenery*factor,first=Math.floor(offset/spacing);
+      for(let i=-1;i<W/spacing+2;i++){
+        const n=i+first,x=i*spacing-offset%spacing,w=spacing-9,h=45+seed(n+layer*93+40)*[160,165,102][layer];
+        ctx.fillStyle=['#171d36','#17233b','#0b192b'][layer];ctx.fillRect(x,base-h,w,h);
+        ctx.strokeStyle=['#343452','#33425e','#285061'][layer];ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(x,base);ctx.lineTo(x,base-h);ctx.lineTo(x+w,base-h);ctx.lineTo(x+w,base);ctx.stroke();
+        if(seed(n+4)>.55){ctx.strokeStyle='#344660';ctx.beginPath();ctx.moveTo(x+w*.5,base-h);ctx.lineTo(x+w*.5,base-h-20);ctx.stroke();}
+        if(layer>0){for(let col=0;col<3;col++)for(let row=0;row<h/19-1;row++)if(seed(n*19+col*3+row*7)>.53){ctx.fillStyle=seed(n+col)>.5?'#5eb9bd45':'#b069bb44';ctx.fillRect(x+12+col*(w-20)/3,base-h+12+row*19,4,6);}}
+        if(layer===2&&seed(n+50)>.68){ctx.fillStyle='#ad76db8c';ctx.fillRect(x+5,base-h+15,3,Math.min(45,h-20));}
+      }
+    }
+    const ground=ctx.createLinearGradient(0,GROUND,0,bottom);ground.addColorStop(0,'#122838');ground.addColorStop(1,'#08101f');ctx.fillStyle=ground;ctx.fillRect(0,GROUND,W,bottom-GROUND);
+    ctx.strokeStyle='#33516670';ctx.lineWidth=1;for(let i=-12;i<=12;i++){ctx.beginPath();ctx.moveTo(W*.5+i*27,GROUND);ctx.lineTo(W*.5+i*160,bottom);ctx.stroke();}
+    for(let i=0;i<9;i++){const f=(i/9+scenery*.00016)%1,y=GROUND+f*f*(bottom-GROUND);ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+    glow(C.cyan,10);ctx.fillStyle='#71dfd4';ctx.fillRect(0,GROUND,W,2);ctx.shadowBlur=0;
+    ctx.fillStyle='#6e9fa957';for(let x=-scenery%100;x<W;x+=100)ctx.fillRect(x,GROUND+10,37,2);
+    if(mode==='story'&&state!=='menu'&&state!=='campaign')drawChapterEnvironment();
+  }
+  function drawChapterEnvironment(){
+    const ch=chapters[story.chapter];ctx.save();ctx.fillStyle=ch.color+'0a';ctx.fillRect(0,0,W,GROUND);
+    if(story.chapter===0){
+      for(let i=-1;i<W/155+1;i++){const x=i*155-scenery*.21%155;roundRect(x,170,75,GROUND-170,18,'#7ccfff08','#7ccfff25');ctx.strokeStyle='#7ccfff44';ctx.beginPath();ctx.moveTo(x+37,180);ctx.lineTo(x+37,GROUND-15);ctx.stroke();for(let j=0;j<8;j++){const y=200+j*28;ctx.fillStyle='#80d4ee30';ctx.fillRect(x+20+Math.sin(j+visualTime)*9,y,30,3);}}
+    }else if(story.chapter===1){
+      ctx.font='10px ui-monospace,monospace';for(let i=-1;i<W/230+1;i++){const x=i*230-scenery*.13%230;roundRect(x,245,115,33,2,'#2a173985','#ef87d544');ctx.fillStyle='#e7a0d280';ctx.fillText(i%2?'REMEMBER RAIN':'MEMORIES / 01',x+7,266);}
+    }else if(story.chapter===2){
+      ctx.strokeStyle='#ffb17c50';for(let i=-1;i<W/190+2;i++){const x=i*190-scenery*.2%190;ctx.beginPath();ctx.moveTo(x,110);ctx.lineTo(x+95,150);ctx.lineTo(x+190,110);ctx.stroke();ctx.fillStyle='#ffcc7c70';ctx.fillRect(x+93,148,4,10);}
+    }else if(story.chapter===3){
+      ctx.strokeStyle='#b49aff36';ctx.lineWidth=2;for(let i=0;i<4;i++){ctx.beginPath();ctx.ellipse(W*.72,255,75+i*30,120+i*15,Math.sin(visualTime*.13+i)*.7,0,Math.PI*2);ctx.stroke();}
+      ctx.strokeStyle='#b49aff42';for(let i=0;i<25;i++){const x=seed(i+90)*W,y=(seed(i+220)*450-visualTime*28%450+450)%450;ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x-2,y-14);ctx.stroke();}
+    }else{
+      const x=W*.78;polygon([[x-58,GROUND],[x-35,180],[x,125],[x+35,180],[x+58,GROUND]],'#152530','#ffdb7860');ctx.fillStyle='#ffdb7830';ctx.fillRect(x-4,160,8,GROUND-160);ctx.strokeStyle='#ffdb7850';for(let j=0;j<5;j++){ctx.beginPath();ctx.moveTo(x-40,240+j*36);ctx.lineTo(x+40,240+j*36);ctx.stroke();}
+    }ctx.restore();
+  }
+  function drawBoss(){
+    if(mode!=='story'||!story.boss.active)return;const b=bossRect(),open=bossOpen(),t=story.boss.time;
+    ctx.save();ctx.translate(b.x+b.w/2,b.y+b.h*.58);glow(open?C.gold:C.violet,22);
+    for(let i=0;i<6;i++){ctx.save();ctx.rotate(i*Math.PI/3+t*.13);polygon([[38,-20],[64,-13],[69,10],[39,19]],'#223449',open?'#d9b277':'#9983cf');ctx.restore();}
+    ctx.beginPath();ctx.arc(0,0,33,0,Math.PI*2);ctx.fillStyle=open?'#ffc568':'#362d56';ctx.fill();ctx.strokeStyle=open?'#fff3ac':'#b397ee';ctx.lineWidth=2;ctx.stroke();
+    ctx.fillStyle=open?'#fffbe5':'#171e32';ctx.beginPath();ctx.ellipse(0,0,open?12:4,21,0,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0;
+    ctx.fillStyle='#201e31';ctx.fillRect(-61,-86,122,5);ctx.fillStyle=C.gold;ctx.fillRect(-61,-86,122*Math.max(0,story.boss.hp)/30,5);ctx.fillStyle='#d9ccba';ctx.font='9px ui-monospace,monospace';ctx.textAlign='center';ctx.fillText('WARDEN / '+(open?'EXPOSED':'GUARDED'),0,-96);ctx.restore();
+    if(story.boss.warned){ctx.save();ctx.setLineDash([12,9]);ctx.strokeStyle='#ff91b45c';ctx.beginPath();ctx.moveTo(player.x,GROUND-(story.boss.low?15:55));ctx.lineTo(b.x,GROUND-(story.boss.low?15:55));ctx.stroke();ctx.restore();}
+  }
+  function drawDino(x,feet,scale=1,duck=false,hero=false){
+    const t=state==='paused'||state==='over'?run.elapsed:visualTime,air=!hero&&player.y<GROUND-2;
+    ctx.save();ctx.translate(x,feet);ctx.scale(scale,scale);
+    if(!hero&&player.inv>0&&Math.floor(visualTime*16)%2===0)ctx.globalAlpha=.35;
+    if(!hero&&player.phase>0){ctx.globalAlpha=.65;glow(C.violet,25);}
+    const stride=air?0:Math.sin(t*(hero?5:19))*9,bob=air?0:Math.abs(Math.sin(t*9))*1.3;
+    ctx.translate(0,-bob);if(duck){ctx.translate(0,-3);ctx.scale(1.17,.49);}
+    if(!hero&&(player.shield||player.phase>0||player.landing)){
+      ctx.save();glow(player.shield?C.blue:C.violet,17);ctx.strokeStyle=player.shield?C.blue:C.violet;ctx.lineWidth=1.8;ctx.beginPath();ctx.ellipse(35,-37,48,46,0,0,Math.PI*2);ctx.stroke();ctx.restore();
+    }
+    // Tail, articulated legs, torso, large muzzle, visor, teeth, and tiny forearm.
+    polygon([[27,-42],[8,-39],[-17,-54],[-9,-30],[17,-20],[37,-27]],'#31b9ab','#92ffdf');
+    polygon([[26,-25],[38,-21],[31+stride,-5],[40+stride,-5],[40+stride,0],[23+stride,0],[20+stride,-9]],'#35998f');
+    polygon([[41,-27],[52,-23],[46-stride,-5],[56-stride,-5],[56-stride,0],[39-stride,0],[35-stride,-11]],'#80f6cf');
+    const bodyGradient=ctx.createLinearGradient(15,-68,54,-12);bodyGradient.addColorStop(0,'#a0ffe0');bodyGradient.addColorStop(1,'#2cc1b0');
+    polygon([[18,-47],[35,-56],[39,-76],[68,-76],[78,-66],[78,-45],[60,-45],[58,-30],[45,-17],[25,-20],[16,-32]],bodyGradient,'#aeffe7');
+    polygon([[20,-32],[37,-31],[51,-41],[57,-37],[49,-23],[39,-18],[25,-21]],'#1a877f');
+    roundRect(43,-68,33,12,3,'#101c36','#75ffe6');glow(C.cyan,8);ctx.fillStyle='#caffff';ctx.fillRect(53,-65,19,3);ctx.shadowBlur=0;
+    ctx.fillStyle='#092f39';ctx.fillRect(64,-50,14,3);ctx.fillStyle='#d3fff0';ctx.fillRect(66,-49,3,4);ctx.fillRect(73,-49,3,3);
+    polygon([[53,-37],[63,-34],[66,-28],[62,-25],[60,-30],[51,-30]],'#89f7cf');
+    for(let i=0;i<3;i++)polygon([[20+i*6,-49-i*4],[18+i*6,-57-i*4],[27+i*6,-52-i*4]],'#b499ff');
+    if(!hero&&hasBlaster()){roundRect(57,-37,25,10,2,'#182c46','#a7b8df');glow(C.cyan);ctx.fillStyle=C.cyan;ctx.fillRect(76,-35,9,5);ctx.shadowBlur=0;}
+    if(!hero&&player.jet>0){roundRect(9,-47,14,26,3,'#28344c',C.gold);glow(C.gold);polygon([[10,-20],[14,-2+Math.sin(t*50)*8],[21,-20]],C.gold);ctx.shadowBlur=0;}
+    ctx.restore();
+  }
+  function drawObstacle(o){
+    ctx.save();ctx.translate(o.x,o.y);
+    if(o.kind.startsWith('bird')){
+      const flap=Math.sin(o.phase)*17;glow(C.pink,9);polygon([[2,15],[23,8],[48,12],[59,21],[38,22],[20,28]],'#b870b9','#ffafed');
+      polygon([[22,17],[7,-7+flap],[36,10]],'#623e81','#c57ac7');polygon([[31,17],[39,-15-flap],[50,14]],'#9855a0','#e59bdb');ctx.shadowBlur=0;ctx.fillStyle='#ffe6ae';ctx.fillRect(43,13,5,3);
+      if(hasBlaster()){ctx.fillStyle=C.pink;ctx.fillRect(10,24,13,4);}
+    }else if(o.kind==='relay'){
+      glow(C.gold,11);roundRect(0,0,o.w,o.h,5,'#2f2b31',C.gold);polygon([[24,9],[38,31],[24,53],[10,31]],'#806139','#ffeda7');ctx.fillStyle='#fff3bd';ctx.fillRect(22,22,4,19);for(let i=0;i<o.hp;i++)ctx.fillRect(9+i*12,61,7,3);
+    }else if(o.kind==='barrier'){
+      roundRect(0,0,o.w,o.h,4,'#392744',o.hp===2?C.pink:C.gold);ctx.fillStyle='#fa73d333';ctx.fillRect(5,5,o.w-10,o.h-10);ctx.strokeStyle=C.pink;ctx.lineWidth=3;
+      ctx.beginPath();ctx.moveTo(9,14);ctx.lineTo(o.w-9,o.h-14);ctx.moveTo(o.w-9,14);ctx.lineTo(9,o.h-14);ctx.stroke();ctx.fillStyle=C.gold;for(let i=0;i<o.hp;i++)ctx.fillRect(12+i*14,-8,9,3);
+    }else{
+      const color=o.kind==='hurdle'?C.violet:C.pink;glow(color,8);roundRect(o.w*.32,0,o.w*.38,o.h,3,'#583156',color);
+      ctx.strokeStyle=color;ctx.lineWidth=6;ctx.lineJoin='round';ctx.beginPath();ctx.moveTo(o.w*.38,o.h*.57);ctx.lineTo(3,o.h*.57);ctx.lineTo(3,o.h*.3);ctx.moveTo(o.w*.7,o.h*.72);ctx.lineTo(o.w-2,o.h*.72);ctx.lineTo(o.w-2,o.h*.43);ctx.stroke();ctx.shadowBlur=0;
+    }ctx.restore();
+  }
+  function drawPickup(o){
+    ctx.save();ctx.translate(o.x,o.y);const r=o.r;
+    if(o.kind==='coin'){glow(C.gold,9);ctx.strokeStyle=C.gold;ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(0,0,Math.max(3,Math.abs(Math.cos(o.phase))*r),r,0,0,Math.PI*2);ctx.stroke();ctx.fillStyle='#ffdb7830';ctx.fill();ctx.fillStyle=C.gold;ctx.fillRect(-1,-4,2,8);}
+    else{const color={shield:C.blue,slow:C.violet,magnet:C.pink,jet:C.gold,battery:C.gold,memory:C.cyan}[o.kind];glow(color,12);ctx.rotate(Math.PI/4);roundRect(-r,-r,r*2,r*2,4,'#142335',color);ctx.rotate(-Math.PI/4);ctx.shadowBlur=0;ctx.fillStyle=color;ctx.font='bold 21px system-ui';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText({shield:'◇',slow:'◷',magnet:'∩',jet:'↑',battery:'+',memory:'M'}[o.kind],0,0);}
+    ctx.restore();
+  }
+  function draw(){
+    ctx.setTransform(1,0,0,1,0,0);ctx.fillStyle='#080e1d';ctx.fillRect(0,0,canvas.width,canvas.height);
+    if(state==='cinematic'||state==='epilogue'||state==='paused'&&pausedFrom==='cinematic'){drawFilm();return;}
+    ctx.setTransform(dpr*renderScale,0,0,dpr*renderScale,0,dpr*viewOffsetY);ctx.save();
+    if(run.shake>0&&fx)ctx.translate(rand(-run.shake,run.shake),rand(-run.shake/2,run.shake/2));background();
+    if(state==='menu'){
+      const scale=W>850?2.55:W>600?2.15:1.7,x=W>600?W*.75:W*.79;
+      ctx.save();ctx.globalAlpha=W>600?1:.35;ctx.fillStyle='#76ffe01a';ctx.beginPath();ctx.ellipse(x+scale*25,330,scale*53,12,0,0,Math.PI*2);ctx.fill();drawDino(x,319,scale,false,true);ctx.font='9px ui-monospace,monospace';ctx.fillStyle='#91b7bd';ctx.textAlign='center';ctx.fillText('SPECIMEN RX-01 / STILL RUNNING',x+scale*25,354);ctx.restore();
+    }else{
+      ctx.fillStyle='#76ffe01a';ctx.beginPath();ctx.ellipse(player.x+30,GROUND+5,36,5,0,0,Math.PI*2);ctx.fill();
+      for(const o of pickups.items)drawPickup(o);for(const o of obstacles.items)drawObstacle(o);
+      drawBoss();
+      for(const b of lasers.items){glow(C.cyan);roundRect(b.x,b.y-2,24,4,2,'#d7fff6');}ctx.shadowBlur=0;
+      for(const b of hostile.items){glow(C.pink);ctx.fillStyle=C.pink;ctx.beginPath();ctx.ellipse(b.x,b.y,8,5,0,0,Math.PI*2);ctx.fill();}ctx.shadowBlur=0;
+      if(player.phase>0){ctx.save();ctx.globalAlpha=.13;drawDino(player.x-38,player.y,1,player.duck);ctx.restore();}
+      drawDino(player.x,player.y,1,player.duck);
+      if(player.slow>0){ctx.fillStyle='#ad94ff09';ctx.fillRect(0,0,W,H);}
+      if(player.magnet>0){ctx.strokeStyle='#ff91d966';ctx.setLineDash([4,9]);ctx.beginPath();ctx.arc(player.x+33,player.y-36,65+Math.sin(visualTime*5)*5,0,Math.PI*2);ctx.stroke();ctx.setLineDash([]);}
+    }
+    for(const p of particles.items){ctx.globalAlpha=clamp(p.life/p.max,0,1);ctx.fillStyle=p.color;ctx.fillRect(p.x,p.y,p.size,p.size);}ctx.globalAlpha=1;
+    for(const l of labels.items){ctx.globalAlpha=Math.min(1,l.life*2);ctx.fillStyle=l.color;ctx.font='bold 13px ui-monospace,monospace';ctx.textAlign='center';ctx.fillText(l.text,clamp(l.x,85,W-85),l.y);}ctx.globalAlpha=1;
+    if(run.flash>0){ctx.fillStyle=`rgba(255,80,145,${run.flash*.55})`;ctx.fillRect(0,0,W,H);}ctx.restore();
+  }
+  function drawFilm(){
+    const w=stage.clientWidth,h=stage.clientHeight,pos=filmPosition(),p=pos.progress,i=pos.index,t=story.film.time,ground=h*.71,actor=clamp(w/700,.7,1.55);
+    ctx.setTransform(dpr,0,0,dpr,0,0);ctx.save();
+    const daylight=i>=4,sky=ctx.createLinearGradient(0,0,0,h);sky.addColorStop(0,daylight?'#284754':'#070c1b');sky.addColorStop(.65,daylight?'#e5aa7b':i===3?'#253550':'#282244');sky.addColorStop(1,daylight?'#718766':'#0b1924');ctx.fillStyle=sky;ctx.fillRect(0,0,w,h);
+    const zoom=fx?1+p*.035:1;ctx.translate(w/2,h/2);ctx.scale(zoom,zoom);ctx.translate(-w/2,-h/2);
+    // Background pans slowly through each shot; the dawn shot replaces neon with life.
+    if(daylight){const sun=ctx.createRadialGradient(w*.73,h*.37,3,w*.73,h*.37,Math.min(w,h)*.33);sun.addColorStop(0,'#fff4b9');sun.addColorStop(.28,'#f7db99ca');sun.addColorStop(1,'#ffc86b00');ctx.fillStyle=sun;ctx.fillRect(0,0,w,h);}
+    for(let layer=0;layer<3;layer++)for(let k=-1;k<w/55+2;k++){
+      const x=k*55-(fx?p*(layer+1)*8:0),bh=25+seed(k+layer*90+100)*h*.26,y=ground-bh;
+      ctx.fillStyle=daylight?['#667876','#465f5e','#284948'][layer]:['#1b2440','#152237','#0e182c'][layer];ctx.fillRect(x,y,49,bh+h*.15);
+      if(!daylight&&i<3){ctx.fillStyle='#c595ba45';for(let row=0;row<4;row++)ctx.fillRect(x+12,y+15+row*17,4,7);}
+    }
+    const towerX=w*.62;polygon([[towerX-actor*44,ground],[towerX-actor*27,h*.34],[towerX,h*.22],[towerX+actor*27,h*.34],[towerX+actor*44,ground]],daylight?'#516661':'#17283c',daylight?'#c4c79a':'#8392b0');
+    ctx.fillStyle=daylight?'#314d42':'#101c2b';ctx.fillRect(0,ground,w,h-ground);
+    if(i===0){
+      const cx=w*.65,cy=h*.46;glow('#b89de3',24);ctx.strokeStyle='#9d85cc';ctx.lineWidth=3;for(let k=0;k<6;k++){ctx.save();ctx.translate(cx,cy);ctx.rotate(k*Math.PI/3);polygon([[28,-14],[52+20*p,-11],[54+20*p,11],[28,14]],'#293447','#a698c5');ctx.restore();}ctx.globalAlpha=1-p*.8;ctx.fillStyle='#d3afeb';ctx.beginPath();ctx.arc(cx,cy,actor*21,0,Math.PI*2);ctx.fill();ctx.globalAlpha=1;ctx.shadowBlur=0;drawDino(w*.24,ground,actor,false,true);
+    }else if(i===1){
+      const x=w*.42-40*actor;drawDino(x,ground,actor*2.1,false,true);const cx=x+70*actor,cy=ground-79*actor;
+      glow(C.gold,25);ctx.strokeStyle='#f8de92';ctx.lineWidth=1.5;for(let k=0;k<45;k++){const a=k*.32+t*.8;ctx.beginPath();ctx.arc(cx+Math.sin(a)*actor*34,cy+(k-22)*actor*2.3,actor*1.6,0,Math.PI*2);ctx.stroke();}ctx.shadowBlur=0;
+    }else if(i===2){
+      const beam=ctx.createLinearGradient(0,0,0,ground);beam.addColorStop(0,'#b5ffd000');beam.addColorStop(.55,'#aaffd170');beam.addColorStop(1,'#fff7ce');ctx.fillStyle=beam;const bw=actor*(12+Math.sin(p*Math.PI)*32);ctx.fillRect(towerX-bw/2,0,bw,ground);glow(C.cyan,30);ctx.strokeStyle='#c5ffe79a';for(let k=0;k<4;k++){ctx.beginPath();ctx.ellipse(towerX,ground-(p*ground+k*70)%ground,actor*(30+k*10),actor*10,0,0,Math.PI*2);ctx.stroke();}ctx.shadowBlur=0;drawDino(w*.33,ground,actor,false,true);
+    }else if(i===3){
+      drawDino(w*.35,ground,actor,false,true);const cx=w*.51,cy=h*(.45-p*.08),fade=1-p*.85;
+      const light=ctx.createRadialGradient(cx,cy,1,cx,cy,actor*65);light.addColorStop(0,'#e6fff1');light.addColorStop(.1,'#91f7d6');light.addColorStop(1,'#91f7d600');ctx.globalAlpha=fade;ctx.fillStyle=light;ctx.fillRect(cx-actor*65,cy-actor*65,actor*130,actor*130);ctx.globalAlpha=1;
+      for(let k=0;k<32;k++){const angle=seed(k+140)*Math.PI*2,dist=p*(50+seed(k+10)*w*.35);ctx.fillStyle='#a7f5c9';ctx.globalAlpha=(1-p)*.8;ctx.fillRect(cx+Math.cos(angle)*dist,cy+Math.sin(angle)*dist,2,2);}ctx.globalAlpha=1;
+    }else{
+      // Seedlings rise during the wide dawn shot. A second Rex steps into frame.
+      for(let k=0;k<20;k++){const x=seed(k+333)*w,growth=(i===5?1:clamp(p*1.7-seed(k+5)*.4,0,1)),height=(18+seed(k+11)*35)*growth;ctx.strokeStyle='#a4c896';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(x,ground+12);ctx.lineTo(x,ground+12-height);ctx.stroke();polygon([[x,ground+10-height*.6],[x-10*growth,ground-height],[x,ground+2-height]],'#91bb80');polygon([[x,ground+7-height*.6],[x+11*growth,ground+4-height],[x,ground-height*.75]],'#c5d69a');}
+      drawDino(w*.26,ground,actor,false,true);if(i===5||p>.25){ctx.save();ctx.globalAlpha=i===5?1:clamp((p-.25)*2,0,1);drawDino(w*(.69-(i===5?.08:p*.08)),ground,actor*.56,false,true);ctx.restore();}
+      for(let k=0;k<28;k++){const x=seed(k+80)*w+Math.sin(t*.5+k)*9,y=h*.35+seed(k+13)*h*.37;ctx.fillStyle='#e1f4b7';ctx.globalAlpha=.35+.3*Math.sin(t+k);ctx.fillRect(x,y,2,2);}ctx.globalAlpha=1;
+    }
+    // A restrained fade between shots and permanent letterboxing establish pacing.
+    const fade=fx?Math.max(0,1-pos.time/.55,(pos.time-(filmShots[i].duration-.5))/.5):0;
+    if(fade>0){ctx.fillStyle='rgba(4,8,15,'+clamp(fade,0,1)+')';ctx.fillRect(-w,-h,w*3,h*3);}ctx.restore();
+    ctx.fillStyle='#050910';ctx.fillRect(0,0,w,h*.085);ctx.fillRect(0,h*.925,w,h*.075);
+    $('filmCredits').hidden=i!==5;
+  }
+  function resize(){
+    const width=stage.clientWidth,height=stage.clientHeight;if(width<=0||height<=0)return;
+    const previousX=player.x;
+    // Portrait keeps at least 640 world units visible, with uniform sprite scaling.
+    renderScale=touchUI&&state!=='menu'?Math.min(width/640,height/H):height/H;
+    W=width/renderScale;viewOffsetY=Math.max(0,(height-H*renderScale)*.45);
+    dpr=Math.min(window.devicePixelRatio||1,touchUI?1.5:2);
+    const pixelW=Math.round(width*dpr),pixelH=Math.round(height*dpr);
+    if(canvas.width!==pixelW||canvas.height!==pixelH){canvas.width=pixelW;canvas.height=pixelH;}
+    player.x=Math.min(180,W*.18);
+    // Translation, not compression, keeps double hurdles jumpable after rotation.
+    if(state!=='menu')for(const pool of pools)for(const o of pool.items)o.x+=player.x-previousX;
+  }
+  function syncTouchUI(){
+    $('app').dataset.touch=String(touchUI);document.body.classList.toggle('mobile-session',touchUI&&state!=='menu');
+    const touchNotes={classic:'Hold JUMP for height. Hold DUCK for low birds.<br>Tap PHASE to pass safely through danger.',shooter:'Hold FIRE to blast hazards. Birds fire back.<br>Use two fingers to jump and fire together.',time:'Start with 45s. Hits −5s. Batteries +5s.<br>Tap PHASE to dodge a hit. Keep moving.',story:modes.story.note};
+    $('modeNote').innerHTML=touchUI?touchNotes[mode]:modes[mode].note;
+    $('abilityName').textContent=(hasBlaster()?'BLASTER':'PHASE')+(touchUI?'':' / X');
+    $('pauseMessage').innerHTML=touchUI?'Your run is safe. Tap RESUME RUN when ready.<br>You can play in portrait or landscape.':'The city can wait. Your run is paused.<br>Press P / Escape or resume when you\'re ready.';
+    const film=state==='cinematic'||state==='paused'&&pausedFrom==='cinematic';$('app').dataset.film=String(film);
+    $('resumeBtn').innerHTML=film?'RESUME FILM <b>→</b>':'RESUME RUN <b>→</b>';
+    if(film)$('pauseMessage').textContent='The ending is paused. Resume when you are ready; every scene will wait for you.';
+    else if(mode==='story')$('pauseMessage').textContent='Your chapter is paused. Resume here, or return to chapter select through the main menu. Completed chapters are saved.';
+  }
+  function updateViewport(){
+    const width=window.innerWidth||stage.clientWidth,height=window.innerHeight||stage.clientHeight;
+    const landscape=width>height,rotated=lastLandscape!==null&&lastLandscape!==landscape;lastLandscape=landscape;
+    touchUI=touchQuery.matches||(window.navigator?.maxTouchPoints||0)>0||width<=600;
+    const viewport=window.visualViewport;
+    document.documentElement.style.setProperty('--app-height',Math.round(viewport&&viewport.scale===1?viewport.height:height)+'px');
+    syncTouchUI();
+    if(touchUI&&rotated&&(state==='playing'||state==='cinematic')){pause();announce('Screen rotated. Tap Resume when ready.');}
+    else resize();
+  }
+  function updateSettings(){$('soundBtn').textContent=audio.muted?'SOUND OFF':'SOUND ON';$('soundBtn').setAttribute('aria-pressed',String(!audio.muted));$('fxBtn').textContent=fx?'FX ON':'FX OFF';$('fxBtn').setAttribute('aria-pressed',String(fx));}
+
+  // Multiple simultaneous key/pointer sources are tracked separately, avoiding stuck
+  // controls when Space+W or two fingers are used and only one is released.
+  const keyActions={Space:'jump',ArrowUp:'jump',KeyW:'jump',ArrowDown:'duck',KeyS:'duck',KeyX:'ability',ShiftLeft:'ability',ShiftRight:'ability'};
+  addEventListener('keydown',e=>{
+    const modal={paused:'pauseOverlay',over:'overOverlay',campaign:'campaignOverlay',briefing:'briefOverlay',chapterclear:'chapterOverlay',epilogue:'epilogueOverlay'}[state];
+    if(e.code==='Tab'&&modal){const buttons=[...$(modal).querySelectorAll('button:not([hidden]):not([disabled]),summary')];if(!buttons.length)return;const first=buttons[0],last=buttons[buttons.length-1];if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}return;}
+    if(e.repeat){if(keyActions[e.code]&&state==='playing')e.preventDefault();return;}
+    if(e.code==='KeyM'){e.preventDefault();audio.toggle();return;}
+    if(e.code==='Escape'||e.code==='KeyP'){e.preventDefault();if(e.code==='Escape'&&state==='campaign')mainMenu();else if(e.code==='Escape'&&['briefing','chapterclear','epilogue'].includes(state))showCampaign();else pause();return;}
+    if(e.code==='Enter'&&e.target.tagName!=='BUTTON'){e.preventDefault();if(state==='menu'||state==='over')start();else if(state==='paused')pause();else if(state==='briefing')nextBrief();return;}
+    const action=keyActions[e.code];if(action&&state==='playing'){e.preventDefault();audio.unlock();press(action,'key:'+e.code);}
+  });
+  addEventListener('keyup',e=>{const action=keyActions[e.code];if(action){release(action,'key:'+e.code);if(state==='playing')e.preventDefault();}});
+  function finishPointer(e){
+    const p=pointers.get(e.pointerId);if(!p)return;
+    release(p.action,'pointer:'+e.pointerId);pointers.delete(e.pointerId);
+    if(![...pointers.values()].some(other=>other.element===p.element))p.element.classList.remove('pressed');
+  }
+  function bindPointer(element,action){
+    element.addEventListener('pointerdown',e=>{
+      if(state!=='playing'||(e.pointerType==='mouse'&&e.button!==0))return;
+      e.preventDefault();audio.unlock();
+      pointers.set(e.pointerId,{element,action,x:e.clientX,y:e.clientY});
+      try{element.setPointerCapture(e.pointerId);}catch{/* Global release still clears input if capture is unavailable. */}
+      press(action,'pointer:'+e.pointerId);element.classList.add('pressed');
+    });
+    element.addEventListener('pointermove',e=>{
+      const p=pointers.get(e.pointerId);if(!p||p.element!==canvas||e.pointerType==='mouse')return;
+      const dy=e.clientY-p.y,dx=e.clientX-p.x;
+      if(p.action==='jump'&&dy>28&&dy>Math.abs(dx)){
+        release('jump','pointer:'+e.pointerId);jumpBuffer=0;p.action='duck';press('duck','pointer:'+e.pointerId);
+      }
+    });
+    for(const type of ['pointerup','pointercancel','lostpointercapture'])element.addEventListener(type,finishPointer);
+    element.addEventListener('contextmenu',e=>{if(state==='playing')e.preventDefault();});
+  }
+  // Releases outside a button, interrupted gestures, and two-finger holds are safe.
+  addEventListener('pointerup',finishPointer);addEventListener('pointercancel',finishPointer);
+  bindPointer(canvas,'jump');document.querySelectorAll('[data-action]').forEach(b=>bindPointer(b,b.dataset.action));
+  document.querySelectorAll('[data-mode]').forEach(b=>b.addEventListener('click',()=>selectMode(b.dataset.mode)));
+  $('startBtn').onclick=start;$('retryBtn').onclick=start;$('pauseBtn').onclick=pause;$('resumeBtn').onclick=pause;$('pauseMenuBtn').onclick=mainMenu;$('overMenuBtn').onclick=mainMenu;
+  document.querySelectorAll('[data-chapter]').forEach(b=>b.onclick=()=>showBriefing(Number(b.dataset.chapter)));
+  $('continueStoryBtn').onclick=()=>showBriefing(Math.min(campaign.cleared,4));$('campaignMenuBtn').onclick=mainMenu;
+  $('briefNext').onclick=nextBrief;$('briefSkip').onclick=()=>beginChapter(story.chapter);$('briefBack').onclick=showCampaign;
+  $('nextChapterBtn').onclick=()=>showBriefing(story.chapter+1);$('chapterSelectBtn').onclick=showCampaign;
+  $('filmPauseBtn').onclick=pause;$('filmSkipBtn').onclick=showEpilogue;
+  $('replayFilmBtn').onclick=()=>startFilm(true);$('epilogueReplay').onclick=()=>startFilm(true);$('epilogueChapters').onclick=showCampaign;$('epilogueMenu').onclick=mainMenu;
+  $('soundBtn').onclick=()=>{audio.toggle();$('soundBtn').blur();};$('fxBtn').onclick=()=>{fx=!fx;storage.set('fx',fx?'1':'0');updateSettings();$('fxBtn').blur();};
+  function pauseForBackground(){if(state==='playing'||state==='cinematic')pause();else clearInput();}
+  addEventListener('blur',pauseForBackground);
+  document.addEventListener('visibilitychange',()=>{if(document.hidden)pauseForBackground();});
+  addEventListener('pagehide',pauseForBackground);
+  addEventListener('resize',updateViewport);addEventListener('orientationchange',()=>{pauseForBackground();updateViewport();});
+  window.visualViewport?.addEventListener('resize',updateViewport);
+  touchQuery.addEventListener?.('change',updateViewport);
+  if(window.ResizeObserver)new ResizeObserver(resize).observe(stage);
+  function frame(timestamp){
+    const dt=lastTime?Math.min((timestamp-lastTime)/1000,.075):0;lastTime=timestamp;
+    if(state!=='paused')visualTime+=dt;
+    if(state==='playing'){
+      accumulator+=dt;while(accumulator>=STEP&&state==='playing'){update(STEP);updateEffects(STEP);accumulator-=STEP;}
+      hudTime+=dt;if(hudTime>=.05){updateHUD();hudTime=0;}
+    }else{accumulator=0;if(state==='menu')scenery+=dt*35;if(state==='cinematic')updateFilm(dt);if(state!=='paused')updateEffects(dt);}
+    draw();requestAnimationFrame(frame);
+  }
+  updateViewport();updateSettings();selectMode(mode);requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
